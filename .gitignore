@@ -1,0 +1,24 @@
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore temporary files
+*.log
+*.tmp
+*.cache
+
+# Ignore uploaded files (jika ada)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Ignore vendor (jika menggunakan Composer)
+vendor/
+
+# Ignore environment files
+.env

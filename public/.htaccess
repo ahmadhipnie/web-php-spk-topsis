@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    Options -Multiviews
+    RewriteEngine On
+    
+    # Jika bukan directory atau file yang diminta
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    
+    # Redirect semua request ke index.php dengan query string
+    RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+</IfModule>
