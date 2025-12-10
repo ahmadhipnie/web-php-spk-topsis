@@ -2,7 +2,7 @@
 // Konfigurasi Aplikasi
 
 // Base URL
-define('BASE_URL', 'http://localhost/rekomendasi-saham-topsis/public/');
+define('BASE_URL', 'http://rekomendasi-saham.test/public/');
 
 // App Info
 define('APP_NAME', 'Sistem Rekomendasi Saham TOPSIS');
@@ -19,4 +19,3 @@ date_default_timezone_set('Asia/Jakarta');
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-?>

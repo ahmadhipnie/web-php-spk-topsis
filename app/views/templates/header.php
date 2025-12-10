@@ -28,13 +28,13 @@
                         <a class="nav-link" href="<?= BASE_URL; ?>">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= BASE_URL; ?>HomeController/about">Tentang</a>
+                        <a class="nav-link" href="<?= BASE_URL; ?>about">Tentang</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Saham</a>
+                        <a class="nav-link" href="<?= BASE_URL; ?>saham">Saham</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Perhitungan TOPSIS</a>
+                        <a class="nav-link" href="<?= BASE_URL; ?>topsis">Perhitungan TOPSIS</a>
                     </li>
                 </ul>
             </div>

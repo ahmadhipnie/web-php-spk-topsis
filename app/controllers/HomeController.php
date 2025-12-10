@@ -27,6 +27,9 @@ class HomeController extends Controller
      */
     public function about()
     {
+        // Debug: pastikan method ini dipanggil
+        error_log("About method called!");
+
         $data = [
             'title' => 'Tentang',
             'heading' => 'Tentang Aplikasi',
