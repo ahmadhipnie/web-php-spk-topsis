@@ -109,7 +109,7 @@ class TopsisController extends Controller
             ];
 
             // Filter data berdasarkan ID yang dipilih
-            $saham_data = array_filter($allDummyData, function($item) use ($saham_ids) {
+            $saham_data = array_filter($allDummyData, function ($item) use ($saham_ids) {
                 return in_array($item->id, $saham_ids);
             });
 
