@@ -1,8 +1,13 @@
 <?php
 // Konfigurasi Aplikasi
 
-// Base URL
-define('BASE_URL', 'http://rekomendasi-saham.test/public/');
+// Base URL - Sederhana untuk PHP built-in server
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost:8000';
+define('BASE_URL', $protocol . '://' . $host . '/');
+
+// Assets URL - Point ke public/assets
+define('ASSETS_URL', BASE_URL . 'public/assets/');
 
 // App Info
 define('APP_NAME', 'Sistem Rekomendasi Saham TOPSIS');
