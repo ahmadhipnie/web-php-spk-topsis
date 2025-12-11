@@ -1,10 +1,17 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3">
+    <footer class="footer-main bg-dark text-white text-center py-4">
         <div class="container">
-            <p class="mb-0">&copy; <?= date('Y'); ?> <?= APP_NAME; ?> - Version <?= APP_VERSION; ?></p>
-            <p class="mb-0 small">Sistem Pendukung Keputusan Metode TOPSIS</p>
+            <div class="row">
+                <div class="col-12">
+                    <p class="mb-1">
+                        <i class="fas fa-chart-line me-2"></i><strong>SahamPintar</strong>
+                    </p>
+                    <p class="mb-1 small text-white-50">Sistem Rekomendasi Saham dengan Metode TOPSIS</p>
+                    <p class="mb-0 small text-white-50">&copy; <?= date('Y'); ?> SahamPintar - v<?= APP_VERSION; ?></p>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -12,6 +19,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="<?= ASSETS_URL; ?>js/script.js"></script>
-    </body>
+</body>
 
-    </html>
+</html>
