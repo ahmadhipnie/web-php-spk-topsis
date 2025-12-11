@@ -13,13 +13,14 @@ class HomeController extends Controller
     {
         $data = [
             'title' => 'Home',
-            'heading' => 'Selamat Datang di ' . APP_NAME,
-            'description' => 'Sistem Pendukung Keputusan untuk Rekomendasi Saham menggunakan metode TOPSIS'
+            'heading' => 'Selamat Datang di SahamPintar',
+            'description' => 'Sistem Rekomendasi Saham menggunakan metode TOPSIS untuk investor pemula',
+            'isHomePage' => true
         ];
 
         $this->view('templates/header', $data);
         $this->view('home/index', $data);
-        $this->view('templates/footer');
+        $this->view('templates/footer', $data);
     }
 
     /**
