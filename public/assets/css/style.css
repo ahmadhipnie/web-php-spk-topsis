@@ -5,7 +5,12 @@
 
 /* Variables */
 :root {
-  --primary-gradient: linear-gradient(135deg, #4f87f5 0%, #3b5fe8 50%, #6c4ed9 100%);
+  --primary-gradient: linear-gradient(
+    135deg,
+    #4f87f5 0%,
+    #3b5fe8 50%,
+    #6c4ed9 100%
+  );
   --primary-blue: #4f87f5;
   --primary-dark: #3b5fe8;
   --primary-purple: #6c4ed9;
@@ -28,7 +33,8 @@ html {
 }
 
 body {
-  font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Segoe UI", "Inter", -apple-system, BlinkMacSystemFont,
+    sans-serif;
   background-color: var(--bg-light);
   min-height: 100%;
   display: flex;
@@ -105,13 +111,14 @@ main.container.page-content {
 }
 
 .hero-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
   width: 50%;
   height: 100%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='rgba(255,255,255,0.1)' d='M0,160L48,144C96,128,192,96,288,112C384,128,480,192,576,208C672,224,768,192,864,160C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom right;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='rgba(255,255,255,0.1)' d='M0,160L48,144C96,128,192,96,288,112C384,128,480,192,576,208C672,224,768,192,864,160C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E")
+    no-repeat bottom right;
   opacity: 0.5;
 }
 
@@ -361,12 +368,24 @@ main.container.page-content {
   color: var(--white);
 }
 
-.feature-icon.icon-blue { background: linear-gradient(135deg, #4f87f5, #3b5fe8); }
-.feature-icon.icon-green { background: linear-gradient(135deg, #22c55e, #16a34a); }
-.feature-icon.icon-purple { background: linear-gradient(135deg, #8b5cf6, #6c4ed9); }
-.feature-icon.icon-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.feature-icon.icon-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); }
-.feature-icon.icon-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.feature-icon.icon-blue {
+  background: linear-gradient(135deg, #4f87f5, #3b5fe8);
+}
+.feature-icon.icon-green {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+.feature-icon.icon-purple {
+  background: linear-gradient(135deg, #8b5cf6, #6c4ed9);
+}
+.feature-icon.icon-orange {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+.feature-icon.icon-teal {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
+.feature-icon.icon-red {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
 
 .feature-card h5 {
   font-size: 1.15rem;
@@ -1323,74 +1342,412 @@ footer p {
   .about-section,
   .analysis-section {
     padding: 1.2rem 1.5rem;
-/* Responsive */
-@media (max-width: 992px) {
-  .hero-title {
-    font-size: 2.2rem;
-  }
-  
-  .hero-stats {
-    gap: 2rem;
-  }
-  
-  .hero-image {
-    margin-top: 3rem;
-  }
-  
-  .trust-items {
-    gap: 1.5rem;
+    /* Responsive */
+    @media (max-width: 992px) {
+      .hero-title {
+        font-size: 2.2rem;
+      }
+
+      .hero-stats {
+        gap: 2rem;
+      }
+
+      .hero-image {
+        margin-top: 3rem;
+      }
+
+      .trust-items {
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-section {
+        padding: 3rem 0 4rem;
+      }
+
+      .hero-title {
+        font-size: 1.8rem;
+      }
+
+      .hero-description {
+        font-size: 1rem;
+      }
+
+      .hero-stats {
+        flex-wrap: wrap;
+        gap: 1.5rem;
+      }
+
+      .stat-item h3 {
+        font-size: 1.5rem;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .btn-cta-primary .btn-cta-secondary {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .trust-items {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .section-title {
+        font-size: 1.75rem;
+      }
+
+      .features-section,
+      .steps-section,
+      .info-section {
+        padding: 3rem 0;
+      }
+
+      .info-card {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
   }
 }
 
-@media (max-width: 768px) {
-  .hero-section {
-    padding: 3rem 0 4rem;
+/* ===================================
+   TOPSIS-FORM.CSS - Form Input Kriteria (UPDATED)
+   =================================== */
+
+/* Reset body background untuk halaman form */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Hero Section - Terpisah dari Navbar */
+.form-hero-section {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+  padding: 4rem 0 3rem;
+  margin-top: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+}
+
+.form-hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+      circle at 20% 50%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+  pointer-events: none;
+}
+
+.hero-content-form {
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+}
+
+.hero-badge-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.hero-badge-form i {
+  font-size: 1rem;
+}
+
+.hero-title-form {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle-form {
+  font-size: 1.1rem;
+  color: #e0e7ff;
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Form Section - Background PUTIH SOLID */
+.form-input-section {
+  background: #ffffff;
+  padding: 3rem 0 4rem;
+  min-height: calc(100vh - 400px);
+}
+
+/* Main Form Card */
+.form-card-main {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+/* Form Groups */
+.form-group-custom {
+  margin-bottom: 1.5rem;
+}
+
+.form-label-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.8rem;
+}
+
+.icon-label {
+  color: #6366f1;
+  font-size: 1.1rem;
+}
+
+.form-hint {
+  display: block;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Input Budget dengan Prefix Rp */
+.input-wrapper-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-prefix {
+  position: absolute;
+  left: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 0.9rem 1rem 0.9rem 3rem;
+  font-size: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+  background: #f9fafb;
+}
+
+.form-control-custom:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Risk Cards - Radio Button sebagai Card */
+.risk-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.risk-card {
+  cursor: pointer;
+  position: relative;
+}
+
+.risk-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.risk-card-content {
+  padding: 1.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  text-align: center;
+  transition: all 0.3s;
+  background: #f9fafb;
+}
+
+.risk-card:hover .risk-card-content {
+  border-color: #c7d2fe;
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.risk-card input[type="radio"]:checked + .risk-card-content {
+  border-color: #6366f1;
+  background: #eef2ff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.risk-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 0.8rem;
+  background: #eef2ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #6366f1;
+}
+
+.risk-card input[type="radio"]:checked + .risk-card-content .risk-icon {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+.risk-card-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.3rem 0;
+}
+
+.risk-card-content p {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Select Dropdown */
+.form-select-custom {
+  width: 100%;
+  padding: 0.9rem 3rem 0.9rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.2em;
+}
+
+.form-select-custom:focus {
+  outline: none;
+  border-color: #6366f1;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Submit Button */
+.form-actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.btn-submit-form {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.btn-submit-form:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+.btn-submit-form:active {
+  transform: translateY(0);
+}
+
+.form-footer-text {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .form-hero-section {
+    padding: 3rem 0 2rem;
   }
-  
-  .hero-title {
-    font-size: 1.8rem;
+
+  .hero-title-form {
+    font-size: 2rem;
   }
-  
-  .hero-description {
-    font-size: 1rem;
+
+  .form-card-main {
+    padding: 2rem 1.5rem;
   }
-  
-  .hero-stats {
-    flex-wrap: wrap;
-    gap: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .risk-cards {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
   }
-  
-  .stat-item h3 {
-    font-size: 1.5rem;
-  }
-  
-  .hero-buttons {
-    flex-direction: column;
-  }
-  
-  .btn-cta-primary
-  .btn-cta-secondary {
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .trust-items {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .section-title {
+
+  .hero-title-form {
     font-size: 1.75rem;
   }
-  
-  .features-section,
-  .steps-section,
-  .info-section {
-    padding: 3rem 0;
+
+  .hero-subtitle-form {
+    font-size: 1rem;
   }
-  
-  .info-card {
-    flex-direction: column;
-    text-align: center;
+}
+
+@media (max-width: 575.98px) {
+  .form-card-main {
+    padding: 1.5rem 1rem;
+    border-radius: 1rem;
+  }
+
+  .form-hero-section {
+    padding: 2.5rem 0 1.5rem;
   }
 }
