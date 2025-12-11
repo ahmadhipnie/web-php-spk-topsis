@@ -1,191 +1,160 @@
-<!-- Perhitungan TOPSIS Page -->
-<div class="row mb-3">
-    <div class="col-12">
-        <h2><i class="fas fa-calculator"></i> Perhitungan TOPSIS</h2>
-        <hr>
+<!-- Form Input Kriteria TOPSIS -->
+
+<!-- Hero Section - Terpisah dari Navbar -->
+<section class="form-hero-section">
+    <div class="container">
+        <div class="hero-content-form text-center">
+            <div class="hero-badge-form mb-3">
+                <i class="fas fa-chart-line"></i>
+                <span>Analisis Saham TOPSIS</span>
+            </div>
+            <h1 class="hero-title-form">Dapatkan Rekomendasi Saham Terbaik</h1>
+            <p class="hero-subtitle-form">Sesuai dengan profil investasi dan tujuan keuangan Anda</p>
+        </div>
     </div>
-</div>
+</section>
 
-<?php if (!empty($saham)) : ?>
-    <form action="<?= BASE_URL; ?>topsis/hitung" method="POST">
-        <!-- Pilih Saham -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-check-square"></i> Langkah 1: Pilih Saham yang Akan Dianalisis</h5>
+<!-- Form Section - Background Putih Solid -->
+<section class="form-input-section">
+    <div class="container">
+        <div class="form-card-main">
+            <form action="<?= BASE_URL; ?>topsis/hitung" method="POST" id="kriteriaForm">
+
+                <!-- Budget Investasi -->
+                <div class="form-group-custom mb-4">
+                    <label class="form-label-custom">
+                        <i class="fas fa-wallet icon-label"></i>
+                        Budget Investasi
+                    </label>
+                    <div class="input-wrapper-custom">
+                        <span class="input-prefix">Rp</span>
+                        <input
+                            type="text"
+                            class="form-control-custom"
+                            name="budget"
+                            id="budgetInput"
+                            placeholder="50.000.000"
+                            required>
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Pilih minimal 2 saham untuk dibandingkan
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th width="50">
-                                            <input type="checkbox" id="selectAll" onclick="toggleAll(this)">
-                                        </th>
-                                        <th>Kode</th>
-                                        <th>Nama Saham</th>
-                                        <th>Harga</th>
-                                        <th>Volume</th>
-                                        <th>Market Cap</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($saham as $s) : ?>
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" name="saham_ids[]" value="<?= $s->id; ?>" class="saham-checkbox">
-                                            </td>
-                                            <td><strong><?= $s->kode_saham; ?></strong></td>
-                                            <td><?= $s->nama_saham; ?></td>
-                                            <td>Rp <?= number_format($s->harga, 0, ',', '.'); ?></td>
-                                            <td><?= number_format($s->volume, 0, ',', '.'); ?></td>
-                                            <td>Rp <?= number_format($s->market_cap, 0, ',', '.'); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <small class="form-hint">Masukkan jumlah dana yang siap Anda investasikan</small>
                 </div>
-            </div>
-        </div>
 
-        <!-- Setting Kriteria & Bobot -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="fas fa-sliders-h"></i> Langkah 2: Tentukan Bobot dan Tipe Kriteria</h5>
+                <!-- Profil Risiko -->
+                <div class="form-group-custom mb-4">
+                    <label class="form-label-custom">
+                        <i class="fas fa-chart-bar icon-label"></i>
+                        Profil Risiko Anda
+                    </label>
+                    <div class="risk-cards">
+                        <label class="risk-card">
+                            <input type="radio" name="profil_risiko" value="konservatif" required>
+                            <div class="risk-card-content">
+                                <div class="risk-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h4>Konservatif</h4>
+                                <p>Prioritas keamanan, return stabil</p>
+                            </div>
+                        </label>
+
+                        <label class="risk-card">
+                            <input type="radio" name="profil_risiko" value="moderat" checked>
+                            <div class="risk-card-content">
+                                <div class="risk-icon">
+                                    <i class="fas fa-balance-scale"></i>
+                                </div>
+                                <h4>Moderat</h4>
+                                <p>Seimbang antara risiko & return</p>
+                            </div>
+                        </label>
+
+                        <label class="risk-card">
+                            <input type="radio" name="profil_risiko" value="agresif">
+                            <div class="risk-card-content">
+                                <div class="risk-icon">
+                                    <i class="fas fa-rocket"></i>
+                                </div>
+                                <h4>Agresif</h4>
+                                <p>Potensi return tinggi, risiko besar</p>
+                            </div>
+                        </label>
                     </div>
-                    <div class="card-body">
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i> Total bobot harus = 100% atau 1
-                        </div>
-
-                        <div class="row">
-                            <!-- Kriteria Harga -->
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-primary">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">Kriteria: Harga</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Bobot</label>
-                                            <input type="number" step="0.01" class="form-control bobot-input" name="bobot_harga" value="0.30" min="0" max="1" required>
-                                            <small class="text-muted">Rentang: 0 - 1</small>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Tipe</label>
-                                            <select name="tipe_harga" class="form-select">
-                                                <option value="cost" selected>Cost (Semakin kecil semakin baik)</option>
-                                                <option value="benefit">Benefit (Semakin besar semakin baik)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Kriteria Volume -->
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-success">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">Kriteria: Volume</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Bobot</label>
-                                            <input type="number" step="0.01" class="form-control bobot-input" name="bobot_volume" value="0.30" min="0" max="1" required>
-                                            <small class="text-muted">Rentang: 0 - 1</small>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Tipe</label>
-                                            <select name="tipe_volume" class="form-select">
-                                                <option value="benefit" selected>Benefit (Semakin besar semakin baik)</option>
-                                                <option value="cost">Cost (Semakin kecil semakin baik)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Kriteria Market Cap -->
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-info">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">Kriteria: Market Cap</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Bobot</label>
-                                            <input type="number" step="0.01" class="form-control bobot-input" name="bobot_market_cap" value="0.40" min="0" max="1" required>
-                                            <small class="text-muted">Rentang: 0 - 1</small>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Tipe</label>
-                                            <select name="tipe_market_cap" class="form-select">
-                                                <option value="benefit" selected>Benefit (Semakin besar semakin baik)</option>
-                                                <option value="cost">Cost (Semakin kecil semakin baik)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <strong>Total Bobot:</strong> <span id="totalBobot">1.00</span>
-                        </div>
-                    </div>
+                    <small class="form-hint">Pilih profil risiko yang sesuai dengan toleransi Anda</small>
                 </div>
-            </div>
-        </div>
 
-        <!-- Tombol Submit -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-lg btn-primary">
-                        <i class="fas fa-calculator"></i> Hitung TOPSIS
+                <!-- Jangka Waktu Investasi -->
+                <div class="form-group-custom mb-4">
+                    <label class="form-label-custom">
+                        <i class="fas fa-clock icon-label"></i>
+                        Jangka Waktu Investasi
+                    </label>
+                    <select class="form-select-custom" name="jangka_waktu" required>
+                        <option value="">Pilih jangka waktu...</option>
+                        <option value="pendek">Pendek (< 1 tahun)</option>
+                        <option value="menengah" selected>Menengah (1-3 tahun)</option>
+                        <option value="panjang">Panjang (> 3 tahun)</option>
+                    </select>
+                    <small class="form-hint">Berapa lama Anda berencana memegang saham ini?</small>
+                </div>
+
+                <!-- Preferensi Sektor -->
+                <div class="form-group-custom mb-5">
+                    <label class="form-label-custom">
+                        <i class="fas fa-building icon-label"></i>
+                        Preferensi Sektor
+                    </label>
+                    <select class="form-select-custom" name="sektor" required>
+                        <option value="semua" selected>Semua Sektor</option>
+                        <option value="perbankan">Perbankan</option>
+                        <option value="teknologi">Teknologi</option>
+                        <option value="konsumer">Barang Konsumsi</option>
+                        <option value="energi">Energi</option>
+                        <option value="properti">Properti</option>
+                        <option value="infrastruktur">Infrastruktur</option>
+                    </select>
+                    <small class="form-hint">Sektor industri yang ingin Anda fokuskan</small>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit-form">
+                        <i class="fas fa-rocket"></i>
+                        Dapatkan Rekomendasi Gratis
                     </button>
+                    <p class="form-footer-text">
+                        <i class="fas fa-lock"></i> Data Anda aman dan tidak akan dibagikan
+                    </p>
                 </div>
-            </div>
-        </div>
-    </form>
 
-    <script>
-        // Toggle select all
-        function toggleAll(source) {
-            const checkboxes = document.querySelectorAll('.saham-checkbox');
-            checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- JavaScript untuk Format Rupiah -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const budgetInput = document.getElementById('budgetInput');
+
+        // Format number dengan separator ribuan
+        function formatRupiah(value) {
+            const number = value.replace(/\D/g, '');
+            return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
-        // Calculate total bobot
-        document.querySelectorAll('.bobot-input').forEach(input => {
-            input.addEventListener('input', () => {
-                let total = 0;
-                document.querySelectorAll('.bobot-input').forEach(inp => {
-                    total += parseFloat(inp.value) || 0;
-                });
-                document.getElementById('totalBobot').textContent = total.toFixed(2);
-
-                // Warning jika tidak 1
-                if (Math.abs(total - 1) > 0.01) {
-                    document.getElementById('totalBobot').style.color = 'red';
-                } else {
-                    document.getElementById('totalBobot').style.color = 'green';
-                }
-            });
+        budgetInput.addEventListener('input', function(e) {
+            const value = e.target.value;
+            e.target.value = formatRupiah(value);
         });
-    </script>
 
-<?php else : ?>
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation-triangle"></i>
-        Belum ada data saham. Silakan <a href="<?= BASE_URL; ?>saham/tambah">tambah data saham</a> terlebih dahulu.
-    </div>
-<?php endif; ?>
+        // Form validation
+        document.getElementById('kriteriaForm').addEventListener('submit', function(e) {
+            const budget = budgetInput.value.replace(/\D/g, '');
+            if (parseInt(budget) < 1000000) {
+                e.preventDefault();
+                alert('Budget minimal Rp 1.000.000');
+                return false;
+            }
+        });
+    });
+</script>
