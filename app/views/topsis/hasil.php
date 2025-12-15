@@ -5,8 +5,8 @@
     <div class="container">
         <div class="row mb-3">
             <div class="col-12">
-                <a href="<?= BASE_URL; ?>" class="back-link">
-                    <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+                <a href="<?= BASE_URL; ?>topsis" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Form
                 </a>
             </div>
         </div>
@@ -14,8 +14,8 @@
         <div class="hero-card-gradient">
             <div class="row align-items-center">
                 <div class="col-lg-12 mb-3">
-                    <h1 class="hero-title">Rekomendasi Saham Anda</h1>
-                    <p class="hero-subtitle">Berdasarkan kriteria yang Anda pilih</p>
+                    <h1 class="hero-title">Rekomendasi Saham untuk <?= htmlspecialchars($data['investorData']['nama_investor']); ?></h1>
+                    <p class="hero-subtitle">Berdasarkan kriteria yang Anda pilih dengan metode TOPSIS</p>
                 </div>
             </div>
 
@@ -25,7 +25,7 @@
                     <div class="kriteria-info-card">
                         <div class="kriteria-label">Budget Investasi</div>
                         <div class="kriteria-value">
-                            Rp <?= isset($kriteria['budget']) ? number_format($kriteria['budget'], 0, ',', '.') : '10.000.000'; ?>
+                            Rp <?= number_format($data['investorData']['budget'], 0, ',', '.'); ?>
                         </div>
                         <div class="kriteria-detail">Dana yang dialokasikan</div>
                     </div>
@@ -35,7 +35,7 @@
                     <div class="kriteria-info-card">
                         <div class="kriteria-label">Profil Risiko</div>
                         <div class="kriteria-value">
-                            <?= isset($kriteria['profil_risiko']) ? ucfirst($kriteria['profil_risiko']) : 'Moderat'; ?>
+                            <?= ucfirst($data['investorData']['profil_risiko']); ?>
                         </div>
                         <div class="kriteria-detail">Tingkat toleransi risiko</div>
                     </div>
@@ -45,7 +45,7 @@
                     <div class="kriteria-info-card">
                         <div class="kriteria-label">Jangka Waktu</div>
                         <div class="kriteria-value">
-                            <?= isset($kriteria['jangka_waktu']) ? ucfirst($kriteria['jangka_waktu']) : 'Menengah'; ?>
+                            <?= ucfirst($data['investorData']['jangka_waktu']); ?>
                         </div>
                         <div class="kriteria-detail">Periode investasi</div>
                     </div>
@@ -55,47 +55,70 @@
                     <div class="kriteria-info-card">
                         <div class="kriteria-label">Sektor</div>
                         <div class="kriteria-value">
-                            <?= isset($kriteria['sektor']) ? ucfirst($kriteria['sektor']) : 'Semua'; ?>
+                            <?= ucfirst($data['investorData']['sektor']); ?>
                         </div>
                         <div class="kriteria-detail">Preferensi sektor saham</div>
                     </div>
                 </div>
             </div>
+
+            <!-- Bobot Kriteria -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="kriteria-info-card">
+                        <div class="kriteria-label">Bobot Kriteria yang Digunakan</div>
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <div class="kriteria-detail">
+                                    <strong>EPS (Benefit):</strong> <?= number_format($data['investorData']['bobot']['EPS'] * 100, 0); ?>%
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="kriteria-detail">
+                                    <strong>PER (Cost):</strong> <?= number_format($data['investorData']['bobot']['PER'] * 100, 0); ?>%
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="kriteria-detail">
+                                    <strong>ROE (Benefit):</strong> <?= number_format($data['investorData']['bobot']['ROE'] * 100, 0); ?>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
 </section>
 
 <!-- Hasil Rekomendasi -->
 <section class="hasil-rekomendasi">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title"><?= !empty($saham) ? count($saham) : '0'; ?> Saham Direkomendasikan</h2>
+            <h2 class="section-title"><?= count($data['hasilTopsis']); ?> Saham Direkomendasikan</h2>
             <p class="section-description">
                 Berdasarkan profil investasi Anda, berikut adalah saham-saham yang paling sesuai dengan
-                kriteria yang telah ditentukan. Anda dapat melihat detail lebih lanjut untuk setiap saham.
+                kriteria yang telah ditentukan. Saham diurutkan berdasarkan skor TOPSIS tertinggi.
             </p>
         </div>
 
         <!-- List Saham Cards -->
         <div class="row">
-            <?php if (!empty($saham)) : ?>
+            <?php if (!empty($data['hasilTopsis'])) : ?>
                 <?php
-                // Sort saham by ranking (placeholder - sesuaikan dengan logic TOPSIS Anda)
-                usort($saham, function ($a, $b) {
-                    return $b->market_cap <=> $a->market_cap;
-                });
                 $rank = 1;
+                foreach ($data['hasilTopsis'] as $hasil) :
+                    $s = $hasil; // Hasil sudah termasuk data saham
                 ?>
-
-                <?php foreach ($saham as $s) : ?>
                     <div class="col-12 mb-3">
                         <div class="saham-card">
                             <!-- Header Card -->
                             <div class="saham-card-header">
                                 <div class="saham-badge-container">
                                     <?php if ($rank == 1): ?>
-                                        <span class="badge-best">Resiko Rendah</span>
+                                        <span class="badge-best">Terbaik</span>
                                     <?php elseif ($rank <= 3): ?>
-                                        <span class="badge-good">Resiko Sedang</span>
+                                        <span class="badge-good">Direkomendasikan</span>
                                     <?php else: ?>
                                         <span class="badge-normal">Pertimbangkan</span>
                                     <?php endif; ?>
@@ -104,22 +127,34 @@
                                 </div>
 
                                 <div class="saham-info">
-                                    <h3 class="saham-code"><?= $s->kode_saham; ?></h3>
-                                    <p class="saham-name"><?= $s->nama_saham; ?></p>
-                                    <span class="saham-tag">Perbankan</span>
+                                    <h3 class="saham-code"><?= htmlspecialchars($s['kode_saham']); ?></h3>
+                                    <p class="saham-name"><?= htmlspecialchars($s['nama_saham']); ?></p>
+                                    <span class="saham-tag"><?= htmlspecialchars(ucfirst($s['sektor'])); ?></span>
                                 </div>
 
                                 <div class="saham-score">
                                     <div class="score-label">Skor TOPSIS</div>
                                     <div class="score-value">
-                                        <?php
-                                        // Placeholder score - ganti dengan hasil TOPSIS sebenarnya
-                                        $score = number_format(0.95 - ($rank * 0.05), 3);
-                                        echo $score;
-                                        ?>
+                                        <?= number_format($s['skor'], 4); ?>
                                     </div>
                                     <div class="score-trend">
-                                        <i class="fas fa-arrow-up"></i> <?= rand(1, 5); ?>%
+                                        <?php
+                                        // Hitung kinerja dari harga_buka dan harga_tutup
+                                        $hargaBuka = floatval($s['harga_buka'] ?? 0);
+                                        $hargaTutup = floatval($s['harga_tutup'] ?? 0);
+                                        $kinerja = 0;
+                                        if ($hargaBuka > 0) {
+                                            $kinerja = (($hargaTutup - $hargaBuka) / $hargaBuka) * 100;
+                                        }
+                                        
+                                        if ($kinerja > 0) {
+                                            echo '<i class="fas fa-arrow-up"></i> ' . number_format($kinerja, 2) . '%';
+                                        } elseif ($kinerja < 0) {
+                                            echo '<i class="fas fa-arrow-down"></i> ' . number_format(abs($kinerja), 2) . '%';
+                                        } else {
+                                            echo '<i class="fas fa-minus"></i> 0.00%';
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                             </div>
@@ -129,33 +164,35 @@
                                 <div class="saham-alert">
                                     <i class="fas fa-info-circle"></i>
                                     <strong>Mengapa direkomendasikan?</strong>
-                                    Saham memiliki fundamental kuat dengan P/E ratio ideal. Dividend yield menarik dan
-                                    pertumbuhan modal yang stabil. Cocok untuk investasi jangka menengah hingga panjang.
+                                    Saham ini memiliki skor TOPSIS tertinggi berdasarkan kriteria EPS, PER, dan ROE yang sesuai dengan profil risiko <strong><?= ucfirst($data['investorData']['profil_risiko']); ?></strong> Anda.
                                 </div>
                             <?php endif; ?>
 
                             <!-- Detail Grid -->
                             <div class="saham-details">
                                 <div class="detail-item">
-                                    <div class="detail-label">Market Cap</div>
-                                    <div class="detail-value">Rp <?= number_format($s->market_cap / 1000, 1); ?> T</div>
+                                    <div class="detail-label">EPS (Earnings Per Share)</div>
+                                    <div class="detail-value"><?= number_format($s['eps'], 2); ?></div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="detail-label">P/E Ratio</div>
-                                    <div class="detail-value"><?= isset($s->pe_ratio) ? number_format($s->pe_ratio, 1) : '20.0'; ?></div>
+                                    <div class="detail-label">PER (Price Earnings Ratio)</div>
+                                    <div class="detail-value"><?= number_format($s['per'], 2); ?>x</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="detail-label">Dividend Yield</div>
-                                    <div class="detail-value"><?= isset($s->dividend_yield) ? number_format($s->dividend_yield, 1) : '3.5'; ?> %</div>
+                                    <div class="detail-label">ROE (Return on Equity)</div>
+                                    <div class="detail-value"><?= number_format($s['roe'], 2); ?>%</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="detail-label">Potensi Return 5.12% per tahun</div>
-                                    <div class="detail-link">
-                                        <a href="<?= BASE_URL; ?>topsis/detail/<?= $s->kode_saham; ?>">
-                                            Lihat Detail <i class="fas fa-arrow-right"></i>
-                                        </a>
-                                    </div>
+                                    <div class="detail-label">Harga Saham (Tutup)</div>
+                                    <div class="detail-value">Rp <?= number_format($s['harga_tutup'], 0, ',', '.'); ?></div>
                                 </div>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div class="saham-action">
+                                <a href="<?= BASE_URL; ?>topsis/detail/<?= $s['id_saham']; ?>" class="btn-detail">
+                                    Lihat Detail Perhitungan <i class="fas fa-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -165,14 +202,28 @@
                 <div class="col-12">
                     <div class="empty-state">
                         <i class="fas fa-inbox fa-3x mb-3"></i>
-                        <h3>Belum Ada Data Saham</h3>
-                        <p>Silakan tambahkan data saham terlebih dahulu atau lakukan perhitungan TOPSIS.</p>
-                        <a href="<?= BASE_URL; ?>saham" class="btn btn-primary mt-3">
-                            <i class="fas fa-plus"></i> Tambah Data Saham
+                        <h3>Belum Ada Hasil Perhitungan</h3>
+                        <p>Silakan lakukan analisis TOPSIS terlebih dahulu untuk mendapatkan rekomendasi saham.</p>
+                        <a href="<?= BASE_URL; ?>topsis" class="btn btn-primary mt-3">
+                            <i class="fas fa-calculator"></i> Mulai Analisis
                         </a>
                     </div>
                 </div>
             <?php endif; ?>
         </div>
+
+        <!-- Action Buttons -->
+        <?php if (!empty($data['hasilTopsis'])): ?>
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="<?= BASE_URL; ?>topsis" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-redo"></i> Analisis Baru
+                </a>
+                <a href="<?= BASE_URL; ?>" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </section>
