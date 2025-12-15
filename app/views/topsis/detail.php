@@ -17,28 +17,30 @@
             <div class="detail-header">
                 <div class="detail-header-left">
                     <div class="detail-badge-code">
-                        <h1 class="stock-code"><?= $saham->kode_saham ?? 'N/A'; ?></h1>
-                        <?php
-                        // Tentukan badge berdasarkan risk level
-                        $risk_badge = 'Resiko Rendah';
-                        $badge_class = 'badge-risk-low';
-                        ?>
-                        <span class="<?= $badge_class; ?>"><?= $risk_badge; ?></span>
+                        <h1 class="stock-code"><?= htmlspecialchars($data['saham']->kode_saham); ?></h1>
+                        <span class="badge-risk-low">Terverifikasi</span>
                     </div>
 
-                    <h2 class="stock-name"><?= $saham->nama_saham ?? 'Nama Saham'; ?></h2>
+                    <h2 class="stock-name"><?= htmlspecialchars($data['saham']->nama_saham); ?></h2>
 
                     <div class="stock-tag">
-                        <span><?= $saham->sektor ?? 'Sektor'; ?></span>
+                        <span><?= htmlspecialchars(ucfirst($data['saham']->sektor)); ?></span>
                     </div>
                 </div>
 
                 <div class="detail-header-right">
-                    <div class="stock-price">Rp <?= isset($saham->harga) ? number_format($saham->harga, 0, ',', '.') : '0'; ?></div>
-                    <div class="stock-change negative">
-                        <i class="fas fa-arrow-down"></i>
-                        -Rp <?= rand(10, 50); ?>
-                        (-<?= number_format(rand(1, 10) / 10, 2); ?>%)
+                    <div class="stock-price">Rp <?= number_format($data['saham']->harga_tutup, 0, ',', '.'); ?></div>
+                    <div class="stock-change <?php 
+                        $hargaBuka = floatval($data['saham']->harga_buka ?? 0);
+                        $hargaTutup = floatval($data['saham']->harga_tutup ?? 0);
+                        $kinerja = 0;
+                        if ($hargaBuka > 0) {
+                            $kinerja = (($hargaTutup - $hargaBuka) / $hargaBuka) * 100;
+                        }
+                        echo ($kinerja >= 0 ? 'positive' : 'negative'); 
+                    ?>">
+                        <i class="fas fa-arrow-<?= $kinerja >= 0 ? 'up' : 'down'; ?>"></i>
+                        <?= number_format(abs($kinerja), 2); ?>%
                     </div>
                 </div>
             </div>
@@ -46,19 +48,25 @@
             <!-- Grid Metrics -->
             <div class="detail-metrics">
                 <div class="metric-item">
-                    <div class="metric-label">Market Capitalization</div>
+                    <div class="metric-label">EPS (Earnings Per Share)</div>
                     <div class="metric-value">
-                        Rp <?= isset($saham->market_cap) ? number_format($saham->market_cap / 1000000000000, 1) : '0'; ?> T
+                        <?= number_format($data['saham']->EPS, 2); ?>
                     </div>
                 </div>
                 <div class="metric-item">
-                    <div class="metric-label">Price to Earnings (P/E)</div>
-                    <div class="metric-value"><?= isset($saham->pe_ratio) ? number_format($saham->pe_ratio, 1) : '0.0'; ?></div>
+                    <div class="metric-label">PER (Price Earnings Ratio)</div>
+                    <div class="metric-value"><?= number_format($data['saham']->PER, 2); ?>x</div>
                 </div>
                 <div class="metric-item">
-                    <div class="metric-label">Dividend Yield</div>
+                    <div class="metric-label">ROE (Return on Equity)</div>
                     <div class="metric-value">
-                        <?= isset($saham->dividend_yield) ? number_format($saham->dividend_yield, 1) : '0.0'; ?> %
+                        <?= number_format($data['saham']->ROE, 2); ?>%
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Harga Tutup per Lembar</div>
+                    <div class="metric-value">
+                        Rp <?= number_format($data['saham']->harga_tutup, 0, ',', '.'); ?>
                     </div>
                 </div>
             </div>
@@ -69,11 +77,15 @@
                     <i class="fas fa-info-circle"></i>
                 </div>
                 <div class="alert-content">
-                    <h4>Mengapa Saham ini Cocok untuk Anda?</h4>
+                    <h4>Mengapa Saham ini Direkomendasikan?</h4>
                     <p>
-                        Perusahaan ini memiliki fundamental kuat dengan P/E ratio ideal, dividend yield yang menarik,
-                        dan pertumbuhan modal yang stabil. Cocok untuk investasi jangka menengah hingga panjang.
-                        Saham ini termasuk blue chip dengan likuiditas tinggi.
+                        Saham <strong><?= htmlspecialchars($data['saham']->kode_saham); ?></strong> memiliki kinerja fundamental yang solid 
+                        dengan EPS <strong><?= number_format($data['saham']->EPS, 2); ?></strong>, 
+                        PER <strong><?= number_format($data['saham']->PER, 2); ?>x</strong>, dan 
+                        ROE <strong><?= number_format($data['saham']->ROE, 2); ?>%</strong>. 
+                        <?php if ($kinerja > 0): ?>
+                        Saham ini menunjukkan tren positif dengan pertumbuhan <strong><?= number_format($kinerja, 2); ?>%</strong>.
+                        <?php endif; ?>
                     </p>
                 </div>
             </div>
@@ -83,13 +95,13 @@
         <div class="about-section">
             <h3 class="section-title-detail">Tentang Perusahaan</h3>
             <p class="about-text">
-                <?= $saham->deskripsi ?? 'Unilever Indonesia adalah produsen terkemuka produk consumer goods dengan brand-brand terkenal seperti Dove, Lifebuoy, dan Sunsilk. Perusahaan memiliki distribusi yang luas dan brand equity yang kuat di Indonesia.'; ?>
+                <strong><?= htmlspecialchars($data['saham']->nama_saham); ?></strong> adalah perusahaan yang bergerak di sektor <strong><?= htmlspecialchars(ucfirst($data['saham']->sektor)); ?></strong> dengan kode saham <strong><?= htmlspecialchars($data['saham']->kode_saham); ?></strong>. Perusahaan ini memiliki fundamental yang solid dan merupakan pilihan investasi yang baik untuk investor dengan berbagai profil risiko.
             </p>
         </div>
 
         <!-- Analisis Investasi -->
         <div class="analysis-section">
-            <h3 class="section-title-detail">Analisis Investasi</h3>
+            <h3 class="section-title-detail">Analisis Kriteria TOPSIS</h3>
 
             <div class="analysis-items">
                 <div class="analysis-item">
@@ -97,9 +109,16 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="analysis-content">
-                        <h4 class="analysis-title">Potensi Return</h4>
+                        <h4 class="analysis-title">EPS (Earnings Per Share)</h4>
                         <p class="analysis-desc">
-                            +<?= number_format(rand(5, 15) + (rand(0, 99) / 100), 2); ?>% per tahun
+                            <strong><?= number_format($data['saham']->EPS, 2); ?></strong> - 
+                            <?php if ($data['saham']->EPS > 500): ?>
+                            Sangat baik, menunjukkan profitabilitas yang tinggi
+                            <?php elseif ($data['saham']->EPS > 200): ?>
+                            Baik, laba per saham cukup stabil
+                            <?php else: ?>
+                            Cukup, masih dalam batas wajar
+                            <?php endif; ?>
                         </p>
                     </div>
                 </div>
@@ -109,9 +128,16 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="analysis-content">
-                        <h4 class="analysis-title">Tingkat Risiko</h4>
+                        <h4 class="analysis-title">PER (Price Earnings Ratio)</h4>
                         <p class="analysis-desc">
-                            Rendah - Sesuai dengan profil risiko moderat Anda
+                            <strong><?= number_format($data['saham']->PER, 2); ?>x</strong> - 
+                            <?php if ($data['saham']->PER < 15): ?>
+                            Sangat menarik, valuasi rendah
+                            <?php elseif ($data['saham']->PER < 25): ?>
+                            Wajar, valuasi sesuai industri
+                            <?php else: ?>
+                            Tinggi, harga sudah cukup mahal
+                            <?php endif; ?>
                         </p>
                     </div>
                 </div>
@@ -121,25 +147,51 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="analysis-content">
-                        <h4 class="analysis-title">Likuiditas</h4>
+                        <h4 class="analysis-title">ROE (Return on Equity)</h4>
                         <p class="analysis-desc">
-                            Tinggi - Volume perdagangan aktif setiap hari
+                            <strong><?= number_format($data['saham']->ROE, 2); ?>%</strong> - 
+                            <?php if ($data['saham']->ROE > 15): ?>
+                            Sangat baik, efisiensi modal tinggi
+                            <?php elseif ($data['saham']->ROE > 10): ?>
+                            Baik, pengelolaan modal cukup efisien
+                            <?php else: ?>
+                            Cukup, masih perlu perbaikan
+                            <?php endif; ?>
                         </p>
                     </div>
                 </div>
 
                 <div class="analysis-item">
-                    <div class="analysis-icon positive">
-                        <i class="fas fa-check-circle"></i>
+                    <div class="analysis-icon <?= $kinerja >= 0 ? 'positive' : 'negative'; ?>">
+                        <i class="fas fa-<?= $kinerja >= 0 ? 'check' : 'exclamation'; ?>-circle"></i>
                     </div>
                     <div class="analysis-content">
-                        <h4 class="analysis-title">Fundamental</h4>
+                        <h4 class="analysis-title">Kinerja Harga</h4>
                         <p class="analysis-desc">
-                            Kuat - Rasio keuangan sehat dan pertumbuhan stabil
+                            <strong><?= number_format($kinerja, 2); ?>%</strong> - 
+                            <?php if ($kinerja > 5): ?>
+                            Tren naik signifikan
+                            <?php elseif ($kinerja > 0): ?>
+                            Tren naik moderat
+                            <?php elseif ($kinerja > -5): ?>
+                            Tren turun moderat
+                            <?php else: ?>
+                            Tren turun signifikan
+                            <?php endif; ?>
                         </p>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="detail-actions">
+            <a href="<?= BASE_URL; ?>topsis/hasil" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Kembali ke Hasil
+            </a>
+            <a href="<?= BASE_URL; ?>topsis" class="btn btn-primary">
+                <i class="fas fa-calculator"></i> Analisis Baru
+            </a>
         </div>
     </div>
 </section>

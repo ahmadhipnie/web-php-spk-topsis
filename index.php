@@ -26,11 +26,16 @@ if (php_sapi_name() === 'cli-server') {
 
 // Load konfigurasi
 require_once 'app/config/config.php';
+require_once 'app/config/database.php';
 
 // Load core classes
 require_once 'core/App.php';
 require_once 'core/Controller.php';
 require_once 'core/Database.php';
+
+// Load helpers
+require_once 'app/helpers/Flasher.php';
+require_once 'app/helpers/TopsisHelper.php';
 
 // Jalankan aplikasi
 $app = new App();

@@ -161,7 +161,7 @@ main.container.page-content {
 
 .btn-cta-primary {
   background: var(--white);
-  color: var(--primary-blue);
+  color: #ffffff;
   padding: 0.875rem 1.75rem;
   border-radius: 10px;
   font-weight: 600;
@@ -174,13 +174,13 @@ main.container.page-content {
 
 .btn-cta-primary:hover {
   background: #f0f4ff;
-  color: var(--primary-dark);
+  color: #ffffff;
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
-}
+}s
 
 .btn-cta-primary i {
-  color: var(--primary-blue);
+  color: var(--white);
 }
 
 .btn-cta-secondary {
@@ -200,6 +200,10 @@ main.container.page-content {
   background: rgba(255, 255, 255, 0.1);
   color: var(--white);
   border-color: var(--white);
+}
+
+.btn-cta-secondary i {
+  color: var(--white);
 }
 
 .hero-stats {
@@ -917,6 +921,43 @@ footer p {
 
 .detail-link a:hover {
   text-decoration: underline;
+}
+
+/* Saham Action Button */
+.saham-action {
+  padding: 1.5rem;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.btn-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #4f87f5 0%, #6c4ed9 100%);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 135, 245, 0.2);
+}
+
+.btn-detail:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 135, 245, 0.3);
+  color: #ffffff;
+}
+
+.btn-detail i {
+  transition: transform 0.3s ease;
+}
+
+.btn-detail:hover i {
+  transform: translateX(4px);
 }
 
 /* Empty State */

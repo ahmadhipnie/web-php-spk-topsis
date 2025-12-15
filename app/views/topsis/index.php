@@ -20,6 +20,21 @@
         <div class="form-card-main">
             <form action="<?= BASE_URL; ?>topsis/hitung" method="POST" id="kriteriaForm">
 
+                <!-- Nama Investor -->
+                <div class="form-group-custom mb-4">
+                    <label class="form-label-custom">
+                        <i class="fas fa-user icon-label"></i>
+                        Nama Investor
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control-custom"
+                        name="nama"
+                        placeholder="Masukkan nama Anda"
+                        required>
+                    <small class="form-hint">Nama akan digunakan untuk identifikasi hasil analisis Anda</small>
+                </div>
+
                 <!-- Budget Investasi -->
                 <div class="form-group-custom mb-4">
                     <label class="form-label-custom">
