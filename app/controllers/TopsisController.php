@@ -76,8 +76,36 @@ class TopsisController extends Controller
                 throw new Exception('Tidak ada saham yang sesuai dengan kriteria budget Rp ' . number_format($budget, 0, ',', '.') . ' dan sektor ' . $sektor);
             }
 
-            // 3. Get bobot berdasarkan profil risiko
-            $bobot = TopsisHelper::getBobotByProfilRisiko($profilRisiko);
+            // 3. Get bobot berdasarkan profil risiko atau custom weight
+            $useCustomWeight = isset($_POST['use_custom_weight']) && $_POST['use_custom_weight'] === 'true';
+            
+            if ($useCustomWeight) {
+                // Ambil custom weights dari form
+                $customEPS = isset($_POST['weight_eps']) ? (float)$_POST['weight_eps'] : 35;
+                $customPER = isset($_POST['weight_per']) ? (float)$_POST['weight_per'] : 35;
+                $customROE = isset($_POST['weight_roe']) ? (float)$_POST['weight_roe'] : 30;
+                
+                // Validasi total = 100%
+                $totalWeight = $customEPS + $customPER + $customROE;
+                
+                if (abs($totalWeight - 100) > 0.1) {
+                    file_put_contents($debugFile, "ERROR: Total bobot tidak 100% ($totalWeight)\n", FILE_APPEND);
+                    throw new Exception('Total bobot harus 100%. Saat ini: ' . $totalWeight . '%');
+                }
+                
+                // Convert percentage to decimal (0-1)
+                $bobot = [
+                    'EPS' => $customEPS / 100,
+                    'PER' => $customPER / 100,
+                    'ROE' => $customROE / 100
+                ];
+                
+                file_put_contents($debugFile, "Using CUSTOM weights: EPS={$customEPS}%, PER={$customPER}%, ROE={$customROE}%\n", FILE_APPEND);
+            } else {
+                // Use default based on risk profile
+                $bobot = TopsisHelper::getBobotByProfilRisiko($profilRisiko);
+                file_put_contents($debugFile, "Using DEFAULT weights for profile: $profilRisiko\n", FILE_APPEND);
+            }
 
             // 4. Hitung TOPSIS
             $hasilTopsis = TopsisHelper::hitungTopsis($sahamData, $bobot);
@@ -104,7 +132,8 @@ class TopsisController extends Controller
                 'profil_risiko' => $profilRisiko,
                 'jangka_waktu' => $jangkaWaktu,
                 'sektor' => $sektor,
-                'bobot' => $bobot
+                'bobot' => $bobot,
+                'use_custom_weight' => $useCustomWeight // Tambahkan flag custom weight
             ];
 
             // 6. Simpan hasil rekomendasi dan topsis ke database

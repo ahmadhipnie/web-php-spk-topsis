@@ -35,7 +35,9 @@
                     <div class="kriteria-info-card">
                         <div class="kriteria-label">Profil Risiko</div>
                         <div class="kriteria-value">
-                            <?= ucfirst($data['investorData']['profil_risiko']); ?>
+                            <?= isset($data['investorData']['use_custom_weight']) && $data['investorData']['use_custom_weight'] 
+                                ? 'Custom' 
+                                : ucfirst($data['investorData']['profil_risiko']); ?>
                         </div>
                         <div class="kriteria-detail">Tingkat toleransi risiko</div>
                     </div>
