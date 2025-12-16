@@ -11,11 +11,16 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // Get market overview data
+        $sahamModel = $this->model('SahamModel');
+        $marketOverview = $sahamModel->getMarketOverview();
+        
         $data = [
             'title' => 'Home',
             'heading' => 'Selamat Datang di SahamPintar',
             'description' => 'Sistem Rekomendasi Saham menggunakan metode TOPSIS untuk investor pemula',
-            'isHomePage' => true
+            'isHomePage' => true,
+            'marketOverview' => $marketOverview
         ];
 
         $this->view('templates/header', $data);

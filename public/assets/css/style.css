@@ -105,9 +105,10 @@ main.container.page-content {
 /* Hero Section */
 .hero-section {
   background: var(--primary-gradient);
-  padding: 4rem 0 6rem;
+  padding: 4rem 0 4rem;
   position: relative;
   overflow: hidden;
+  min-height: auto;
 }
 
 .hero-section::before {
@@ -207,21 +208,111 @@ main.container.page-content {
 }
 
 .hero-stats {
-  display: flex;
-  gap: 3rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
-.stat-item h3 {
-  color: var(--white);
-  font-size: 1.75rem;
+.stat-item {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-item .stat-icon {
+  font-size: 2rem;
+  opacity: 0.9;
+  min-width: 50px;
+  text-align: center;
+  color: var(--primary);
+}
+
+.stat-item .stat-content {
+  flex: 1;
+}
+
+.stat-item .stat-label {
+  color: #6b7280;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+}
+
+.stat-item .stat-value {
+  color: #111827;
+  font-size: 1.4rem;
   font-weight: 700;
   margin: 0;
+  line-height: 1.2;
 }
 
-.stat-item p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  margin: 0;
+.stat-item .stat-change {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+.stat-item .stat-subtitle {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  font-weight: 400;
+}
+
+/* Special styles for gainer/loser */
+.stat-item.stat-gainer {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-left: 4px solid #10b981;
+}
+
+.stat-item.stat-gainer .stat-icon {
+  color: #10b981;
+}
+
+.stat-item.stat-loser {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-left: 4px solid #ef4444;
+}
+
+.stat-item.stat-loser .stat-icon {
+  color: #ef4444;
+}
+
+/* Market Average - Full Width */
+.stat-item.stat-market-avg {
+  grid-column: span 4;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%, rgba(255, 255, 255, 0.95) 100%);
+  border: 2px solid rgba(59, 130, 246, 0.4);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.stat-item.stat-market-avg .stat-icon {
+  font-size: 2.5rem;
+  color: #3b82f6;
+}
+
+.stat-item.stat-market-avg .stat-value {
+  font-size: 1.6rem;
+  color: #111827;
 }
 
 .hero-image {
@@ -1046,6 +1137,15 @@ footer p {
   .hero-title {
     font-size: 1.6rem;
   }
+  
+  .hero-section {
+    padding: 3rem 0 6rem;
+    min-height: auto;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+  }
 
   .saham-card-header {
     flex-direction: column;
@@ -1060,11 +1160,50 @@ footer p {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+  
+  /* Hero Stats Responsive for Tablet */
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .stat-item.stat-market-avg {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Hero image hidden on mobile to prevent overlap */
+  .hero-image {
+    display: none;
+  }
+  
+  .hero-section .col-lg-6 {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 575.98px) {
   .hero-card-gradient {
     padding: 1.2rem;
+  }
+  
+  .hero-section {
+    padding: 2rem 0 4rem;
+  }
+  
+  .hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+  }
+  
+  .hero-buttons .btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .saham-badge-container {
@@ -1079,6 +1218,34 @@ footer p {
 
   .action-buttons .btn {
     width: 100%;
+  }
+  
+  /* Hero Stats Responsive for Mobile */
+  .hero-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .stat-item.stat-market-avg {
+    grid-column: span 1;
+  }
+  
+  .stat-item {
+    padding: 1.2rem;
+  }
+  
+  .stat-item .stat-icon {
+    font-size: 1.5rem;
+    min-width: 40px;
+  }
+  
+  .stat-item .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .stat-item .stat-change {
+    font-size: 0.9rem;
   }
 }
 

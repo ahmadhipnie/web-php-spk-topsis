@@ -17,21 +17,6 @@
                         <i class="fas fa-play-circle me-2"></i>Pelajari Lebih Lanjut
                     </a>
                 </div>
-                
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <h3>50.000+</h3>
-                        <p>Investor Aktif</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>100+</h3>
-                        <p>Saham Dianalisis</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>95%</h3>
-                        <p>Akurasi</p>
-                    </div>
-                </div>
             </div>
             <div class="col-lg-6">
                 <div class="hero-image">
@@ -41,6 +26,102 @@
                             <strong>+25.5%</strong>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Market Overview Stats - Separate Row -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="hero-stats">
+                    <?php if (isset($data['marketOverview']) && $data['marketOverview']): 
+                        $market = $data['marketOverview'];
+                    ?>
+                    <!-- Last Update Date -->
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Update Terakhir</p>
+                            <h3 class="stat-value"><?= $market['last_update_formatted']; ?></h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Total Stocks Monitored -->
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Saham Dipantau</p>
+                            <h3 class="stat-value"><?= $market['stock_count']; ?> Saham</h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Gainer -->
+                    <div class="stat-item stat-gainer">
+                        <div class="stat-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Top Gainer</p>
+                            <h3 class="stat-value">
+                                <?php if ($market['top_gainer']): ?>
+                                    <?= $market['top_gainer']['kode_saham']; ?>
+                                    <span class="stat-change text-success">+<?= $market['top_gainer']['return']; ?>%</span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Loser -->
+                    <div class="stat-item stat-loser">
+                        <div class="stat-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Top Loser</p>
+                            <h3 class="stat-value">
+                                <?php if ($market['top_loser']): ?>
+                                    <?= $market['top_loser']['kode_saham']; ?>
+                                    <span class="stat-change text-danger"><?= $market['top_loser']['return']; ?>%</span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Market Average (Full Width) -->
+                    <div class="stat-item stat-market-avg">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Kondisi Pasar (<?= $market['period']; ?>)</p>
+                            <h3 class="stat-value">
+                                <span class="<?= $market['sentiment_class']; ?>">
+                                    <?= $market['market_sentiment']; ?>
+                                </span>
+                                <span class="stat-subtitle">Rata-rata Return: 
+                                    <strong class="<?= $market['average_return'] >= 0 ? 'text-success' : 'text-danger'; ?>">
+                                        <?= $market['average_return']; ?>%
+                                    </strong>
+                                </span>
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <?php else: ?>
+                    <!-- Fallback jika data tidak tersedia -->
+                    <div class="stat-item">
+                        <h3>-</h3>
+                        <p>Data Tidak Tersedia</p>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
