@@ -384,7 +384,123 @@ class SahamModel
         $this->db->query($query);
         return $this->db->resultSet();
     }
+
+    /**
+     * Get top stocks by return percentage
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @param int $limit
+     * @return array
+     */
+    public function getTopStocksByReturn($tanggal_mulai, $tanggal_akhir, $limit = 10)
+    {
+        $query = "SELECT 
+                    s.kode_saham,
+                    s.nama_saham,
+                    s.sektor,
+                    s.EPS,
+                    s.PER,
+                    s.ROE,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal >= :tanggal_mulai 
+                     ORDER BY tanggal ASC LIMIT 1) as harga_awal,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal <= :tanggal_akhir 
+                     ORDER BY tanggal DESC LIMIT 1) as harga_akhir,
+                    ((SELECT harga_tutup FROM " . $this->table . " 
+                      WHERE kode_saham = s.kode_saham 
+                      AND tanggal <= :tanggal_akhir2 
+                      ORDER BY tanggal DESC LIMIT 1) - 
+                     (SELECT harga_tutup FROM " . $this->table . " 
+                      WHERE kode_saham = s.kode_saham 
+                      AND tanggal >= :tanggal_mulai2 
+                      ORDER BY tanggal ASC LIMIT 1)) / 
+                     (SELECT harga_tutup FROM " . $this->table . " 
+                      WHERE kode_saham = s.kode_saham 
+                      AND tanggal >= :tanggal_mulai3 
+                      ORDER BY tanggal ASC LIMIT 1) * 100 as return_pct
+                  FROM (SELECT DISTINCT kode_saham, nama_saham, sektor, EPS, PER, ROE 
+                        FROM " . $this->table . ") s
+                  HAVING harga_awal IS NOT NULL 
+                    AND harga_akhir IS NOT NULL 
+                    AND return_pct IS NOT NULL
+                  ORDER BY return_pct DESC
+                  LIMIT :limit";
+        
+        $this->db->query($query);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+        $this->db->bind(':tanggal_akhir2', $tanggal_akhir);
+        $this->db->bind(':tanggal_mulai2', $tanggal_mulai);
+        $this->db->bind(':tanggal_mulai3', $tanggal_mulai);
+        $this->db->bind(':limit', $limit);
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get stock ranking for a specific period (for comparison)
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @param array $stockCodes (optional - filter specific stocks)
+     * @return array
+     */
+    public function getStockRanking($tanggal_mulai, $tanggal_akhir, $stockCodes = [])
+    {
+        // Build WHERE clause for stock codes filter
+        $whereClause = '';
+        if (!empty($stockCodes)) {
+            $placeholders = implode(',', array_fill(0, count($stockCodes), '?'));
+            $whereClause = " AND kode_saham IN ($placeholders)";
+        }
+        
+        $query = "SELECT 
+                    kode_saham,
+                    nama_saham,
+                    harga_awal,
+                    harga_akhir,
+                    ((harga_akhir - harga_awal) / harga_awal) * 100 as return_pct
+                  FROM (
+                    SELECT 
+                        t1.kode_saham,
+                        MAX(t1.nama_saham) as nama_saham,
+                        (SELECT harga_tutup FROM " . $this->table . " t2 
+                         WHERE t2.kode_saham = t1.kode_saham 
+                         AND t2.tanggal >= ? 
+                         ORDER BY t2.tanggal ASC LIMIT 1) as harga_awal,
+                        (SELECT harga_tutup FROM " . $this->table . " t3 
+                         WHERE t3.kode_saham = t1.kode_saham 
+                         AND t3.tanggal <= ? 
+                         ORDER BY t3.tanggal DESC LIMIT 1) as harga_akhir
+                    FROM " . $this->table . " t1
+                    WHERE 1=1 $whereClause
+                    GROUP BY t1.kode_saham
+                  ) subquery
+                  WHERE harga_awal IS NOT NULL 
+                    AND harga_akhir IS NOT NULL
+                    AND harga_awal > 0
+                  ORDER BY return_pct DESC";
+        
+        $this->db->query($query);
+        
+        // Bind date parameters
+        $this->db->bind(1, $tanggal_mulai);
+        $this->db->bind(2, $tanggal_akhir);
+        
+        // Bind stock codes if provided
+        if (!empty($stockCodes)) {
+            $paramIndex = 3;
+            foreach ($stockCodes as $code) {
+                $this->db->bind($paramIndex++, $code);
+            }
+        }
+        
+        return $this->db->resultSet();
+    }
 }
+
 
 
 

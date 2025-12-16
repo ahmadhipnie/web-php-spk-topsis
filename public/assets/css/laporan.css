@@ -1,0 +1,268 @@
+/* ===================================
+   LAPORAN MODAL STYLES
+   =================================== */
+
+/* Button in Navbar */
+.btn-laporan {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white !important;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-laporan:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-laporan:active {
+  transform: translateY(0);
+}
+
+/* Modal Customization */
+#modalLaporan .modal-content {
+  border: none;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+#modalLaporan .modal-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-bottom: none;
+  padding: 1.5rem;
+}
+
+#modalLaporan .modal-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+#modalLaporan .modal-body {
+  padding: 2rem;
+}
+
+/* Laporan Preview Section */
+.laporan-preview h6 {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.laporan-preview .alert {
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.laporan-preview strong {
+  font-size: 1.05rem;
+  color: #111827;
+}
+
+.laporan-preview small {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* Top Stocks Preview */
+#topStocksPreview .card {
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+#topStocksPreview .card-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+}
+
+#topStocksPreview .list-group-item {
+  border-left: none;
+  border-right: none;
+  padding: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+#topStocksPreview .list-group-item:hover {
+  background-color: #f9fafb;
+}
+
+#topStocksPreview .list-group-item:first-child {
+  border-top: none;
+}
+
+#topStocksPreview .list-group-item:last-child {
+  border-bottom: none;
+}
+
+#topStocksPreview .badge {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+  font-weight: 700;
+}
+
+/* Configuration Section */
+.laporan-config h6 {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.laporan-config .form-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.laporan-config .form-select {
+  border-radius: 0.5rem;
+  border: 2px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.laporan-config .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Download Section */
+.laporan-download h6 {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.laporan-download .btn {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.laporan-download .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.laporan-download .btn:active {
+  transform: translateY(0);
+}
+
+.laporan-download .btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.laporan-download .btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.laporan-download .btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.laporan-download .btn-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.laporan-download small {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Loading State */
+#laporanLoading {
+  min-height: 300px;
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#laporanLoading .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3rem;
+}
+
+/* Content State */
+#laporanContent {
+  display: block !important; /* Always visible */
+  opacity: 1 !important; /* Prevent fade out */
+  visibility: visible !important; /* Ensure visibility */
+}
+
+/* Laporan Info Section */
+.laporan-info {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+.laporan-info .alert {
+  margin-bottom: 1rem;
+}
+
+/* Configuration and Download sections always visible */
+.laporan-config,
+.laporan-download {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .btn-laporan {
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+  }
+  
+  #modalLaporan .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .laporan-preview .alert {
+    padding: 1rem;
+  }
+  
+  .laporan-download .btn {
+    padding: 0.85rem;
+    font-size: 0.95rem;
+  }
+  
+  #topStocksPreview .list-group-item {
+    padding: 0.75rem;
+  }
+  
+  #topStocksPreview h5 {
+    font-size: 1rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Remove animation from content - causes it to disappear */
+/* #laporanContent {
+  animation: fadeInUp 0.4s ease-out;
+} */
