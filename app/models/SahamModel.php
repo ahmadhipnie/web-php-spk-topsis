@@ -259,5 +259,132 @@ class SahamModel
 
         return $this->db->single();
     }
+
+    /**
+     * Get stock historical data untuk chart
+     * @param string $kode_saham
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @return array
+     */
+    public function getStockHistorical($kode_saham, $tanggal_mulai, $tanggal_akhir)
+    {
+        $query = "SELECT * FROM " . $this->table . " 
+                  WHERE kode_saham = :kode_saham 
+                  AND tanggal >= :tanggal_mulai 
+                  AND tanggal <= :tanggal_akhir 
+                  ORDER BY tanggal ASC";
+        
+        $this->db->query($query);
+        $this->db->bind(':kode_saham', $kode_saham);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get list of available stock codes (unique)
+     * @return array
+     */
+    public function getAvailableStocks()
+    {
+        $query = "SELECT DISTINCT kode_saham, nama_saham, sektor 
+                  FROM " . $this->table . " 
+                  ORDER BY kode_saham ASC";
+        
+        $this->db->query($query);
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get sector performance data for calculating average return
+     * Returns first and last price for each stock in date range
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @return array
+     */
+    public function getSectorPerformance($tanggal_mulai, $tanggal_akhir)
+    {
+        $query = "SELECT 
+                    s.kode_saham,
+                    s.nama_saham,
+                    s.sektor,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal >= :tanggal_mulai 
+                     ORDER BY tanggal ASC LIMIT 1) as harga_awal,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal <= :tanggal_akhir 
+                     ORDER BY tanggal DESC LIMIT 1) as harga_akhir
+                  FROM (SELECT DISTINCT kode_saham, nama_saham, sektor 
+                        FROM " . $this->table . ") s
+                  ORDER BY s.sektor, s.kode_saham";
+        
+        $this->db->query($query);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get top performing stocks in a specific sector
+     * @param string $sektor
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @param int $limit
+     * @return array
+     */
+    public function getTopStocksBySektor($sektor, $tanggal_mulai, $tanggal_akhir, $limit = 3)
+    {
+        $query = "SELECT 
+                    s.kode_saham,
+                    s.nama_saham,
+                    s.sektor,
+                    s.EPS,
+                    s.PER,
+                    s.ROE,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal >= :tanggal_mulai 
+                     ORDER BY tanggal ASC LIMIT 1) as harga_awal,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal <= :tanggal_akhir 
+                     ORDER BY tanggal DESC LIMIT 1) as harga_akhir
+                  FROM (SELECT DISTINCT kode_saham, nama_saham, sektor, EPS, PER, ROE 
+                        FROM " . $this->table . " 
+                        WHERE sektor = :sektor) s
+                  HAVING harga_awal IS NOT NULL AND harga_akhir IS NOT NULL
+                  ORDER BY ((harga_akhir - harga_awal) / harga_awal) DESC
+                  LIMIT :limit";
+        
+        $this->db->query($query);
+        $this->db->bind(':sektor', $sektor);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+        $this->db->bind(':limit', $limit);
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get all unique sectors
+     * @return array
+     */
+    public function getAllSectors()
+    {
+        $query = "SELECT DISTINCT sektor 
+                  FROM " . $this->table . " 
+                  WHERE sektor IS NOT NULL
+                  ORDER BY sektor ASC";
+        
+        $this->db->query($query);
+        return $this->db->resultSet();
+    }
 }
+
+
 
