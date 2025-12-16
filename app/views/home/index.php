@@ -17,21 +17,6 @@
                         <i class="fas fa-play-circle me-2"></i>Pelajari Lebih Lanjut
                     </a>
                 </div>
-                
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <h3>50.000+</h3>
-                        <p>Investor Aktif</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>100+</h3>
-                        <p>Saham Dianalisis</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>95%</h3>
-                        <p>Akurasi</p>
-                    </div>
-                </div>
             </div>
             <div class="col-lg-6">
                 <div class="hero-image">
@@ -44,6 +29,102 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Market Overview Stats - Separate Row -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="hero-stats">
+                    <?php if (isset($data['marketOverview']) && $data['marketOverview']): 
+                        $market = $data['marketOverview'];
+                    ?>
+                    <!-- Last Update Date -->
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Update Terakhir</p>
+                            <h3 class="stat-value"><?= $market['last_update_formatted']; ?></h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Total Stocks Monitored -->
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Saham Dipantau</p>
+                            <h3 class="stat-value"><?= $market['stock_count']; ?> Saham</h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Gainer -->
+                    <div class="stat-item stat-gainer">
+                        <div class="stat-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Top Gainer</p>
+                            <h3 class="stat-value">
+                                <?php if ($market['top_gainer']): ?>
+                                    <?= $market['top_gainer']['kode_saham']; ?>
+                                    <span class="stat-change text-success">+<?= $market['top_gainer']['return']; ?>%</span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Loser -->
+                    <div class="stat-item stat-loser">
+                        <div class="stat-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Top Loser</p>
+                            <h3 class="stat-value">
+                                <?php if ($market['top_loser']): ?>
+                                    <?= $market['top_loser']['kode_saham']; ?>
+                                    <span class="stat-change text-danger"><?= $market['top_loser']['return']; ?>%</span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Market Average (Full Width) -->
+                    <div class="stat-item stat-market-avg">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <p class="stat-label">Kondisi Pasar (<?= $market['period']; ?>)</p>
+                            <h3 class="stat-value">
+                                <span class="<?= $market['sentiment_class']; ?>">
+                                    <?= $market['market_sentiment']; ?>
+                                </span>
+                                <span class="stat-subtitle">Rata-rata Return: 
+                                    <strong class="<?= $market['average_return'] >= 0 ? 'text-success' : 'text-danger'; ?>">
+                                        <?= $market['average_return']; ?>%
+                                    </strong>
+                                </span>
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <?php else: ?>
+                    <!-- Fallback jika data tidak tersedia -->
+                    <div class="stat-item">
+                        <h3>-</h3>
+                        <p>Data Tidak Tersedia</p>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Trust Indicators -->
@@ -53,6 +134,160 @@
                 <span><i class="fas fa-check-circle"></i> Data Terpercaya</span>
                 <span><i class="fas fa-check-circle"></i> Rekomendasi Akurat</span>
                 <span><i class="fas fa-check-circle"></i> Metode TOPSIS Terverifikasi</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stock Chart Section -->
+<section class="stock-chart-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-badge"><i class="fas fa-chart-line me-2"></i>Monitor Pasar Real-time</span>
+            <h2 class="section-title">Pergerakan Harga Saham</h2>
+            <p class="section-description">Pantau pergerakan harga saham favorit Anda dengan grafik interaktif dan data historis lengkap</p>
+        </div>
+
+        <!-- Chart Controls -->
+        <div class="chart-controls">
+            <div class="row align-items-center">
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label class="control-label"><i class="fas fa-building me-2"></i>Pilih Saham</label>
+                    <select id="stockSelect" class="form-select form-select-lg">
+                        <option value="BBCA">BBCA - Bank Central Asia</option>
+                        <!-- Will be populated via JavaScript -->
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label class="control-label"><i class="fas fa-calendar-alt me-2"></i>Rentang Waktu</label>
+                    <select id="periodeSelect" class="form-select form-select-lg">
+                        <option value="7">7 Hari</option>
+                        <option value="30" selected>30 Hari (1 Bulan)</option>
+                        <option value="90">90 Hari (3 Bulan)</option>
+                        <option value="180">180 Hari (6 Bulan)</option>
+                        <option value="365">365 Hari (1 Tahun)</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-12 mb-3">
+                    <label class="control-label">&nbsp;</label>
+                    <button id="downloadBtn" class="btn btn-download-data w-100">
+                        <i class="fas fa-download me-2"></i>Download Data CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="chart-container-wrapper">
+            <!-- Loading Overlay -->
+            <div id="chartLoading" class="chart-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Memuat data saham...</p>
+            </div>
+
+            <!-- Candlestick Chart (Harga) -->
+            <div class="chart-box">
+                <h5 class="chart-box-title">
+                    <i class="fas fa-chart-candlestick me-2"></i>Grafik Harga Saham (OHLC)
+                    <span class="badge bg-info ms-2">Candlestick</span>
+                </h5>
+                <div id="priceChart"></div>
+            </div>
+
+            <!-- Volume Chart -->
+            <div class="chart-box mt-4">
+                <h5 class="chart-box-title">
+                    <i class="fas fa-chart-bar me-2"></i>Volume Transaksi
+                    <span class="badge bg-success ms-2">Bar Chart</span>
+                </h5>
+                <div id="volumeChart"></div>
+            </div>
+
+            <!-- Chart Info -->
+            <div class="chart-info mt-3">
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="info-box">
+                            <span class="info-label">Total Data</span>
+                            <strong id="infoTotalData" class="info-value">-</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-box">
+                            <span class="info-label">Harga Tertinggi</span>
+                            <strong id="infoHighest" class="info-value">-</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-box">
+                            <span class="info-label">Harga Terendah</span>
+                            <strong id="infoLowest" class="info-value">-</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="info-box">
+                            <span class="info-label">Perubahan</span>
+                            <strong id="infoChange" class="info-value">-</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sector Analysis Section -->
+<section class="sector-analysis-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-badge"><i class="fas fa-layer-group me-2"></i>Analisis Sektor</span>
+            <h2 class="section-title">Perbandingan Performa Antar Sektor</h2>
+            <p class="section-description">Lihat sektor mana yang paling menguntungkan dan saham terbaik di setiap sektor</p>
+        </div>
+
+        <!-- Period Filter -->
+        <div class="sector-controls">
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6">
+                    <label class="control-label"><i class="fas fa-calendar-alt me-2"></i>Periode Analisis</label>
+                    <select id="sectorPeriodeSelect" class="form-select form-select-lg">
+                        <option value="7">7 Hari Terakhir</option>
+                        <option value="30" selected>30 Hari Terakhir</option>
+                        <option value="90">90 Hari Terakhir</option>
+                        <option value="365">1 Tahun Terakhir</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sector Performance Chart -->
+        <div class="sector-chart-wrapper">
+            <!-- Loading Overlay -->
+            <div id="sectorLoading" class="chart-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Menganalisis performa sektor...</p>
+            </div>
+
+            <div class="chart-box">
+                <h5 class="chart-box-title">
+                    <i class="fas fa-chart-bar me-2"></i>Rata-rata Return Per Sektor
+                    <span class="badge bg-primary ms-2">Bar Chart</span>
+                </h5>
+                <div id="sectorPerformanceChart"></div>
+            </div>
+        </div>
+
+        <!-- Top Stocks by Sector -->
+        <div class="sector-stocks-wrapper mt-5">
+            <h4 class="mb-4 text-center">
+                <i class="fas fa-trophy me-2"></i>Top 3 Saham Terbaik Per Sektor
+            </h4>
+            <div id="sectorStocksGrid" class="row g-4">
+                <!-- Will be populated by JavaScript -->
             </div>
         </div>
     </div>
@@ -228,3 +463,17 @@
         </a>
     </div>
 </section>
+<!-- Set BASE_URL for JavaScript -->
+<script>
+    const BASE_URL = '<?= BASE_URL; ?>';
+    const ASSETS_URL = '<?= ASSETS_URL; ?>';
+</script>
+
+<!-- ApexCharts Library -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script>
+
+<!-- Stock Chart Script -->
+<script src="<?= ASSETS_URL; ?>js/stock-chart.js"></script>
+
+<!-- Sector Analysis Script -->
+<script src="<?= ASSETS_URL; ?>js/sector-analysis.js"></script>

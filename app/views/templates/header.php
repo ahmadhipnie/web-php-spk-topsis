@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Home'; ?> - SahamPintar</title>
     <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/style.css">
+    <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/stock-chart.css">
+    <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/sector-analysis.css">
+    <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/laporan.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -33,6 +36,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= BASE_URL; ?>about">Tentang</a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link btn-laporan" id="btnOpenLaporan" type="button">
+                            <i class="fas fa-download me-1"></i> Unduh Laporan
+                        </button>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= BASE_URL; ?>topsis">Analisis TOPSIS</a>

@@ -259,5 +259,355 @@ class SahamModel
 
         return $this->db->single();
     }
+
+    /**
+     * Get stock historical data untuk chart
+     * @param string $kode_saham
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @return array
+     */
+    public function getStockHistorical($kode_saham, $tanggal_mulai, $tanggal_akhir)
+    {
+        $query = "SELECT * FROM " . $this->table . " 
+                  WHERE kode_saham = :kode_saham 
+                  AND tanggal >= :tanggal_mulai 
+                  AND tanggal <= :tanggal_akhir 
+                  ORDER BY tanggal ASC";
+        
+        $this->db->query($query);
+        $this->db->bind(':kode_saham', $kode_saham);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get list of available stock codes (unique)
+     * @return array
+     */
+    public function getAvailableStocks()
+    {
+        $query = "SELECT DISTINCT kode_saham, nama_saham, sektor 
+                  FROM " . $this->table . " 
+                  ORDER BY kode_saham ASC";
+        
+        $this->db->query($query);
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get sector performance data for calculating average return
+     * Returns first and last price for each stock in date range
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @return array
+     */
+    public function getSectorPerformance($tanggal_mulai, $tanggal_akhir)
+    {
+        $query = "SELECT 
+                    s.kode_saham,
+                    s.nama_saham,
+                    s.sektor,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal >= :tanggal_mulai 
+                     ORDER BY tanggal ASC LIMIT 1) as harga_awal,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal <= :tanggal_akhir 
+                     ORDER BY tanggal DESC LIMIT 1) as harga_akhir
+                  FROM (SELECT DISTINCT kode_saham, nama_saham, sektor 
+                        FROM " . $this->table . ") s
+                  ORDER BY s.sektor, s.kode_saham";
+        
+        $this->db->query($query);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get top performing stocks in a specific sector
+     * @param string $sektor
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @param int $limit
+     * @return array
+     */
+    public function getTopStocksBySektor($sektor, $tanggal_mulai, $tanggal_akhir, $limit = 3)
+    {
+        $query = "SELECT 
+                    s.kode_saham,
+                    s.nama_saham,
+                    s.sektor,
+                    s.EPS,
+                    s.PER,
+                    s.ROE,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal >= :tanggal_mulai 
+                     ORDER BY tanggal ASC LIMIT 1) as harga_awal,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal <= :tanggal_akhir 
+                     ORDER BY tanggal DESC LIMIT 1) as harga_akhir
+                  FROM (SELECT DISTINCT kode_saham, nama_saham, sektor, EPS, PER, ROE 
+                        FROM " . $this->table . " 
+                        WHERE sektor = :sektor) s
+                  HAVING harga_awal IS NOT NULL AND harga_akhir IS NOT NULL
+                  ORDER BY ((harga_akhir - harga_awal) / harga_awal) DESC
+                  LIMIT :limit";
+        
+        $this->db->query($query);
+        $this->db->bind(':sektor', $sektor);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+        $this->db->bind(':limit', $limit);
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get all unique sectors
+     * @return array
+     */
+    public function getAllSectors()
+    {
+        $query = "SELECT DISTINCT sektor 
+                  FROM " . $this->table . " 
+                  WHERE sektor IS NOT NULL
+                  ORDER BY sektor ASC";
+        
+        $this->db->query($query);
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get top stocks by return percentage
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @param int $limit
+     * @return array
+     */
+    public function getTopStocksByReturn($tanggal_mulai, $tanggal_akhir, $limit = 10)
+    {
+        $query = "SELECT 
+                    s.kode_saham,
+                    s.nama_saham,
+                    s.sektor,
+                    s.EPS,
+                    s.PER,
+                    s.ROE,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal >= :tanggal_mulai 
+                     ORDER BY tanggal ASC LIMIT 1) as harga_awal,
+                    (SELECT harga_tutup FROM " . $this->table . " 
+                     WHERE kode_saham = s.kode_saham 
+                     AND tanggal <= :tanggal_akhir 
+                     ORDER BY tanggal DESC LIMIT 1) as harga_akhir,
+                    ((SELECT harga_tutup FROM " . $this->table . " 
+                      WHERE kode_saham = s.kode_saham 
+                      AND tanggal <= :tanggal_akhir2 
+                      ORDER BY tanggal DESC LIMIT 1) - 
+                     (SELECT harga_tutup FROM " . $this->table . " 
+                      WHERE kode_saham = s.kode_saham 
+                      AND tanggal >= :tanggal_mulai2 
+                      ORDER BY tanggal ASC LIMIT 1)) / 
+                     (SELECT harga_tutup FROM " . $this->table . " 
+                      WHERE kode_saham = s.kode_saham 
+                      AND tanggal >= :tanggal_mulai3 
+                      ORDER BY tanggal ASC LIMIT 1) * 100 as return_pct
+                  FROM (SELECT DISTINCT kode_saham, nama_saham, sektor, EPS, PER, ROE 
+                        FROM " . $this->table . ") s
+                  HAVING harga_awal IS NOT NULL 
+                    AND harga_akhir IS NOT NULL 
+                    AND return_pct IS NOT NULL
+                  ORDER BY return_pct DESC
+                  LIMIT :limit";
+        
+        $this->db->query($query);
+        $this->db->bind(':tanggal_mulai', $tanggal_mulai);
+        $this->db->bind(':tanggal_akhir', $tanggal_akhir);
+        $this->db->bind(':tanggal_akhir2', $tanggal_akhir);
+        $this->db->bind(':tanggal_mulai2', $tanggal_mulai);
+        $this->db->bind(':tanggal_mulai3', $tanggal_mulai);
+        $this->db->bind(':limit', $limit);
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get stock ranking for a specific period (for comparison)
+     * @param string $tanggal_mulai
+     * @param string $tanggal_akhir
+     * @param array $stockCodes (optional - filter specific stocks)
+     * @return array
+     */
+    public function getStockRanking($tanggal_mulai, $tanggal_akhir, $stockCodes = [])
+    {
+        // Build WHERE clause for stock codes filter
+        $whereClause = '';
+        if (!empty($stockCodes)) {
+            $placeholders = implode(',', array_fill(0, count($stockCodes), '?'));
+            $whereClause = " AND kode_saham IN ($placeholders)";
+        }
+        
+        $query = "SELECT 
+                    kode_saham,
+                    nama_saham,
+                    harga_awal,
+                    harga_akhir,
+                    ((harga_akhir - harga_awal) / harga_awal) * 100 as return_pct
+                  FROM (
+                    SELECT 
+                        t1.kode_saham,
+                        MAX(t1.nama_saham) as nama_saham,
+                        (SELECT harga_tutup FROM " . $this->table . " t2 
+                         WHERE t2.kode_saham = t1.kode_saham 
+                         AND t2.tanggal >= ? 
+                         ORDER BY t2.tanggal ASC LIMIT 1) as harga_awal,
+                        (SELECT harga_tutup FROM " . $this->table . " t3 
+                         WHERE t3.kode_saham = t1.kode_saham 
+                         AND t3.tanggal <= ? 
+                         ORDER BY t3.tanggal DESC LIMIT 1) as harga_akhir
+                    FROM " . $this->table . " t1
+                    WHERE 1=1 $whereClause
+                    GROUP BY t1.kode_saham
+                  ) subquery
+                  WHERE harga_awal IS NOT NULL 
+                    AND harga_akhir IS NOT NULL
+                    AND harga_awal > 0
+                  ORDER BY return_pct DESC";
+        
+        $this->db->query($query);
+        
+        // Bind date parameters
+        $this->db->bind(1, $tanggal_mulai);
+        $this->db->bind(2, $tanggal_akhir);
+        
+        // Bind stock codes if provided
+        if (!empty($stockCodes)) {
+            $paramIndex = 3;
+            foreach ($stockCodes as $code) {
+                $this->db->bind($paramIndex++, $code);
+            }
+        }
+        
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get market overview data for hero section
+     * Returns: last update date, stock count, top gainer, top loser, average return (7 days)
+     */
+    public function getMarketOverview()
+    {
+        try {
+            // 1. Get last update date
+            $this->db->query("SELECT MAX(tanggal) as last_update FROM saham");
+            $lastUpdate = $this->db->single();
+            
+            // 2. Get total monitored stocks
+            $this->db->query("SELECT COUNT(DISTINCT kode_saham) as stock_count FROM saham");
+            $stockCount = $this->db->single();
+            
+            // 3. Calculate date range (7 days ago)
+            $tanggal_akhir = $lastUpdate->last_update;
+            $tanggal_mulai = date('Y-m-d', strtotime($tanggal_akhir . ' -7 days'));
+            
+            // 4. Get all stocks with their 7-day return
+            $this->db->query("
+                SELECT 
+                    t1.kode_saham,
+                    MAX(t1.nama_saham) as nama_saham,
+                    (SELECT harga_tutup 
+                     FROM saham t2 
+                     WHERE t2.kode_saham = t1.kode_saham 
+                     AND t2.tanggal >= ?
+                     ORDER BY t2.tanggal ASC 
+                     LIMIT 1) as harga_awal,
+                    (SELECT harga_tutup 
+                     FROM saham t3 
+                     WHERE t3.kode_saham = t1.kode_saham 
+                     AND t3.tanggal <= ?
+                     ORDER BY t3.tanggal DESC 
+                     LIMIT 1) as harga_akhir
+                FROM saham t1
+                GROUP BY t1.kode_saham
+            ");
+            
+            $this->db->bind(1, $tanggal_mulai);
+            $this->db->bind(2, $tanggal_akhir);
+            $stocks = $this->db->resultSet();
+            
+            // Calculate returns and filter valid data
+            $validReturns = [];
+            foreach ($stocks as $stock) {
+                if ($stock->harga_awal && $stock->harga_akhir && $stock->harga_awal > 0) {
+                    $return = (($stock->harga_akhir - $stock->harga_awal) / $stock->harga_awal) * 100;
+                    $validReturns[] = [
+                        'kode_saham' => $stock->kode_saham,
+                        'nama_saham' => $stock->nama_saham,
+                        'return' => round($return, 2),
+                        'harga_awal' => $stock->harga_awal,
+                        'harga_akhir' => $stock->harga_akhir
+                    ];
+                }
+            }
+            
+            // Sort by return
+            usort($validReturns, function($a, $b) {
+                return $b['return'] <=> $a['return'];
+            });
+            
+            // 5. Get top gainer (highest positive return)
+            $topGainer = $validReturns[0] ?? null;
+            
+            // 6. Get top loser (lowest/most negative return)
+            $topLoser = end($validReturns) ?: null;
+            
+            // 7. Calculate average market return
+            $totalReturn = array_sum(array_column($validReturns, 'return'));
+            $avgReturn = count($validReturns) > 0 ? round($totalReturn / count($validReturns), 2) : 0;
+            
+            // 8. Determine market sentiment
+            $marketSentiment = 'Netral';
+            $sentimentClass = 'text-secondary';
+            if ($avgReturn > 2) {
+                $marketSentiment = 'Bullish';
+                $sentimentClass = 'text-success';
+            } elseif ($avgReturn < -2) {
+                $marketSentiment = 'Bearish';
+                $sentimentClass = 'text-danger';
+            }
+            
+            return [
+                'last_update' => $lastUpdate->last_update,
+                'last_update_formatted' => date('d M Y', strtotime($lastUpdate->last_update)),
+                'stock_count' => $stockCount->stock_count,
+                'top_gainer' => $topGainer,
+                'top_loser' => $topLoser,
+                'average_return' => $avgReturn,
+                'market_sentiment' => $marketSentiment,
+                'sentiment_class' => $sentimentClass,
+                'period' => '7 hari terakhir'
+            ];
+            
+        } catch (Exception $e) {
+            error_log("Error in getMarketOverview: " . $e->getMessage());
+            return null;
+        }
+    }
 }
+
+
+
+
+
+
+
 

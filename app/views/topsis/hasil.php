@@ -35,7 +35,9 @@
                     <div class="kriteria-info-card">
                         <div class="kriteria-label">Profil Risiko</div>
                         <div class="kriteria-value">
-                            <?= ucfirst($data['investorData']['profil_risiko']); ?>
+                            <?= isset($data['investorData']['use_custom_weight']) && $data['investorData']['use_custom_weight'] 
+                                ? 'Custom' 
+                                : ucfirst($data['investorData']['profil_risiko']); ?>
                         </div>
                         <div class="kriteria-detail">Tingkat toleransi risiko</div>
                     </div>
@@ -154,7 +156,32 @@
                                         } else {
                                             echo '<i class="fas fa-minus"></i> 0.00%';
                                         }
+                                        
+                                        // Logika Saran Sistem berdasarkan Skor TOPSIS + Kinerja
+                                        if ($s['skor'] >= 0.6 && $kinerja >= 0) {
+                                            $saranSistem = 'Buy';
+                                            $saranClass = 'badge-buy';
+                                            $saranIcon = 'fa-thumbs-up';
+                                            $saranText = 'Beli';
+                                        } elseif ($s['skor'] >= 0.4 || ($s['skor'] >= 0.3 && $kinerja > 2)) {
+                                            $saranSistem = 'Hold';
+                                            $saranClass = 'badge-hold';
+                                            $saranIcon = 'fa-hand-paper';
+                                            $saranText = 'Tahan';
+                                        } else {
+                                            $saranSistem = 'Avoid';
+                                            $saranClass = 'badge-avoid';
+                                            $saranIcon = 'fa-exclamation-triangle';
+                                            $saranText = 'Hindari';
+                                        }
                                         ?>
+                                    </div>
+                                    
+                                    <!-- Saran Sistem Badge -->
+                                    <div class="score-recommendation">
+                                        <span class="recommendation-badge <?= $saranClass; ?>">
+                                            <i class="fas <?= $saranIcon; ?>"></i> <?= $saranText; ?>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

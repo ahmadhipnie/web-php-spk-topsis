@@ -1,0 +1,259 @@
+/* ===================================
+   SECTOR ANALYSIS SECTION
+   =================================== */
+
+.sector-analysis-section {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 6rem 0;
+}
+
+/* Sector Controls */
+.sector-controls {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Sector Chart Wrapper */
+.sector-chart-wrapper {
+  position: relative;
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Sector Stocks Wrapper */
+.sector-stocks-wrapper h4 {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1.75rem;
+}
+
+/* Sector Card */
+.sector-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.sector-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Sector Card Header */
+.sector-card-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sector-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: white;
+}
+
+.sector-info {
+  flex: 1;
+}
+
+.sector-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.sector-return {
+  display: inline-block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  color: white;
+  margin-top: 0.25rem;
+}
+
+/* Sector Card Body */
+.sector-card-body {
+  padding: 1.5rem;
+}
+
+/* Stock Item */
+.stock-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.stock-item:last-child {
+  margin-bottom: 0;
+}
+
+.stock-item:hover {
+  background: #f3f4f6;
+  border-color: #3b82f6;
+}
+
+/* Rank Badge */
+.stock-rank {
+  flex-shrink: 0;
+}
+
+.rank-badge {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.3);
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.3);
+}
+
+/* Stock Details */
+.stock-details {
+  flex: 1;
+}
+
+.stock-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.stock-code {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.stock-return {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.stock-name-full {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+/* Stock Metrics */
+.stock-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.stock-price-info {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stock-price-info small {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sector-analysis-section {
+    padding: 4rem 0;
+  }
+  
+  .sector-controls {
+    padding: 1.5rem;
+  }
+  
+  .sector-chart-wrapper {
+    padding: 1.5rem;
+  }
+  
+  .sector-card-header {
+    padding: 1.25rem;
+  }
+  
+  .sector-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .sector-name {
+    font-size: 1.1rem;
+  }
+  
+  .stock-item {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .rank-badge {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .stock-metrics {
+    gap: 0.35rem;
+  }
+  
+  .metric-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+  }
+}

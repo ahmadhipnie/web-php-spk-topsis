@@ -184,6 +184,31 @@
             </div>
         </div>
 
+        <!-- Visualisasi Grafik -->
+        <div class="chart-section">
+            <h3 class="section-title-detail">Visualisasi Performa Saham</h3>
+            
+            <div class="row">
+                <!-- Chart 1: Kriteria TOPSIS -->
+                <div class="col-lg-6 mb-4">
+                    <div class="chart-card">
+                        <h4 class="chart-title">Kriteria Fundamental</h4>
+                        <p class="chart-subtitle">Nilai EPS, PER, dan ROE</p>
+                        <canvas id="criteriaChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Data Harga -->
+                <div class="col-lg-6 mb-4">
+                    <div class="chart-card">
+                        <h4 class="chart-title">Pergerakan Harga Saham</h4>
+                        <p class="chart-subtitle">Buka, Tertinggi, Terendah, Tutup</p>
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="detail-actions">
             <a href="<?= BASE_URL; ?>topsis/hasil" class="btn btn-outline-primary">
@@ -195,3 +220,21 @@
         </div>
     </div>
 </section>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Data untuk Chart (Inject dari PHP) -->
+<script>
+const sahamChartData = {
+    eps: <?= $data['saham']->EPS; ?>,
+    per: <?= $data['saham']->PER; ?>,
+    roe: <?= $data['saham']->ROE; ?>,
+    hargaBuka: <?= $data['saham']->harga_buka; ?>,
+    hargaTertinggi: <?= $data['saham']->harga_tertinggi; ?>,
+    hargaTerendah: <?= $data['saham']->harga_terendah; ?>,
+    hargaTutup: <?= $data['saham']->harga_tutup; ?>
+};
+</script>
+
+<!-- Chart Initialization Script -->
+<script src="<?= ASSETS_URL; ?>js/detail-charts.js"></script>
