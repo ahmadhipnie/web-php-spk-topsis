@@ -85,10 +85,21 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script>
     <!-- Custom JS -->
     <script src="<?= ASSETS_URL; ?>js/script.js"></script>
     <!-- Laporan Modal JS -->
     <script src="<?= ASSETS_URL; ?>js/laporan.js"></script>
+    <!-- Compare JS (only on compare page) -->
+    <?php if (isset($data['judul']) && $data['judul'] === 'Bandingkan Saham'): ?>
+    <script>
+        // Define BASE_URL for compare.js
+        window.BASE_URL = '<?= BASE_URL; ?>';
+        console.log('BASE_URL defined in footer:', window.BASE_URL);
+    </script>
+    <script src="<?= ASSETS_URL; ?>js/compare.js"></script>
+    <?php endif; ?>
 </body>
 
 </html>

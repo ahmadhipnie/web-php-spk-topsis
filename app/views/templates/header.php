@@ -9,8 +9,11 @@
     <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/stock-chart.css">
     <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/sector-analysis.css">
     <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/laporan.css">
+    <link rel="stylesheet" href="<?= ASSETS_URL; ?>css/compare.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -36,6 +39,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= BASE_URL; ?>about">Tentang</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= BASE_URL; ?>compare">
+                            <i class="bi bi-bar-chart-line me-1"></i> Bandingkan Saham
+                        </a>
                     </li>
                     <li class="nav-item">
                         <button class="nav-link btn-laporan" id="btnOpenLaporan" type="button">

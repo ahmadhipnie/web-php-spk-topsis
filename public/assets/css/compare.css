@@ -1,0 +1,204 @@
+/* Comparison Page Styles */
+
+/* Date Range Buttons */
+.date-range-buttons .btn-check:checked + .btn-outline-primary {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.date-range-buttons .btn-outline-primary {
+    transition: all 0.3s ease;
+}
+
+.date-range-buttons .btn-outline-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart Container */
+#priceChart {
+    min-height: 400px;
+}
+
+/* Comparison Table */
+.comparison-table {
+    font-size: 0.95rem;
+}
+
+.comparison-table thead th {
+    font-weight: 600;
+    vertical-align: middle;
+    background-color: #f8f9fa;
+}
+
+.comparison-table tbody td {
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.comparison-table .table-secondary td {
+    font-weight: 600;
+    background-color: #e9ecef;
+}
+
+/* Positive/Negative Values */
+.value-positive {
+    color: #198754;
+    font-weight: 600;
+}
+
+.value-negative {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.value-neutral {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* Best Value Highlight */
+.best-value {
+    background-color: #d1e7dd !important;
+    font-weight: 700;
+    border-left: 4px solid #198754;
+}
+
+/* Stock Selection Form */
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Loading Spinner */
+#loadingSpinner {
+    padding: 40px 0;
+}
+
+/* Winner Alert */
+#winnerAlert {
+    border-left: 5px solid #198754;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card Animations */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .date-range-buttons {
+        flex-direction: column;
+    }
+    
+    .date-range-buttons .btn {
+        margin-bottom: 5px;
+    }
+    
+    .comparison-table {
+        font-size: 0.85rem;
+    }
+    
+    .comparison-table tbody td,
+    .comparison-table thead th {
+        padding: 8px;
+    }
+    
+    #priceChart {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 576px) {
+    .comparison-table {
+        font-size: 0.75rem;
+    }
+    
+    .card-header h5 {
+        font-size: 1rem;
+    }
+}
+
+/* Stock Column Styling */
+.stock-column {
+    min-width: 150px;
+    background-color: #f8f9fa;
+}
+
+/* Info Icons */
+.bi {
+    vertical-align: middle;
+}
+
+/* Submit Button Animation */
+.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+/* ApexCharts Tooltip Styling */
+.apexcharts-tooltip {
+    border: 1px solid #e3e3e3;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.apexcharts-tooltip-title {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e3e3e3;
+    padding: 8px;
+    font-weight: 600;
+}
+
+/* Table Hover Effect */
+.comparison-table tbody tr:hover {
+    background-color: #f1f3f5;
+    transition: background-color 0.2s ease;
+}
+
+/* Results Section Animation */
+#resultsSection {
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Number Formatting */
+.number-large {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+/* Category Row Styling */
+.table-secondary td {
+    background-color: #e9ecef !important;
+    border-top: 2px solid #dee2e6;
+    border-bottom: 2px solid #dee2e6;
+}
