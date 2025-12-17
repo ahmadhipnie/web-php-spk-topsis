@@ -602,6 +602,189 @@ class SahamModel
             return null;
         }
     }
+
+    /**
+     * Get list of stocks for comparison dropdown
+     * @return array
+     */
+    public function getStockList()
+    {
+        // First, try to get stocks with the latest date
+        $query = "SELECT DISTINCT kode_saham, nama_saham, sektor 
+                  FROM " . $this->table . " 
+                  WHERE tanggal = (SELECT MAX(tanggal) FROM " . $this->table . ")
+                  ORDER BY kode_saham ASC";
+        
+        $this->db->query($query);
+        $results = $this->db->resultSet();
+        
+        // If no results (no tanggal column or no data), fallback to simple query
+        if (empty($results)) {
+            $query = "SELECT DISTINCT kode_saham, 
+                      COALESCE(nama_saham, kode_saham) as nama_saham,
+                      COALESCE(sektor, 'N/A') as sektor
+                      FROM " . $this->table . " 
+                      ORDER BY kode_saham ASC 
+                      LIMIT 50";
+            
+            $this->db->query($query);
+            $results = $this->db->resultSet();
+        }
+        
+        return $results;
+    }
+
+    /**
+     * Get historical price data for chart
+     * @param array $stockCodes Array of stock codes
+     * @param int $days Number of days to retrieve
+     * @return array
+     */
+    public function getHistoricalData($stockCodes, $days = 30)
+    {
+        $placeholders = implode(',', array_fill(0, count($stockCodes), '?'));
+        
+        $query = "SELECT kode_saham, nama_saham, tanggal, harga_tutup 
+                  FROM " . $this->table . " 
+                  WHERE kode_saham IN ($placeholders) 
+                  AND tanggal >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                  ORDER BY tanggal ASC, kode_saham ASC";
+        
+        $this->db->query($query);
+        
+        // Bind stock codes
+        foreach ($stockCodes as $index => $code) {
+            $this->db->bind($index + 1, $code);
+        }
+        // Bind days
+        $this->db->bind(count($stockCodes) + 1, $days);
+        
+        $results = $this->db->resultSet();
+        
+        // Group by stock code for easier processing
+        $grouped = [];
+        foreach ($results as $row) {
+            $code = $row->kode_saham;
+            if (!isset($grouped[$code])) {
+                $grouped[$code] = [
+                    'name' => $row->nama_saham,
+                    'data' => []
+                ];
+            }
+            $grouped[$code]['data'][] = [
+                'date' => $row->tanggal,
+                'price' => floatval($row->harga_tutup)
+            ];
+        }
+        
+        return $grouped;
+    }
+
+    /**
+     * Get comparison metrics for selected stocks
+     * @param array $stockCodes Array of stock codes
+     * @param int $days Number of days for calculations
+     * @return array
+     */
+    public function getComparisonMetrics($stockCodes, $days = 30)
+    {
+        $metrics = [];
+        
+        foreach ($stockCodes as $code) {
+            // Get latest data
+            $queryLatest = "SELECT * FROM " . $this->table . " 
+                           WHERE kode_saham = ? 
+                           ORDER BY tanggal DESC 
+                           LIMIT 1";
+            
+            $this->db->query($queryLatest);
+            $this->db->bind(1, $code);
+            $latest = $this->db->single();
+            
+            if (!$latest) continue;
+            
+            // Get historical data for period
+            $queryHistory = "SELECT harga_tutup, tanggal 
+                            FROM " . $this->table . " 
+                            WHERE kode_saham = ? 
+                            AND tanggal >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                            ORDER BY tanggal ASC";
+            
+            $this->db->query($queryHistory);
+            $this->db->bind(1, $code);
+            $this->db->bind(2, $days);
+            $history = $this->db->resultSet();
+            
+            if (empty($history)) continue;
+            
+            // Calculate metrics
+            $prices = array_map(function($row) { return floatval($row->harga_tutup); }, $history);
+            $firstPrice = $prices[0];
+            $lastPrice = end($prices);
+            
+            // Return percentage
+            $returnPct = (($lastPrice - $firstPrice) / $firstPrice) * 100;
+            
+            // Calculate daily returns for volatility
+            $dailyReturns = [];
+            for ($i = 1; $i < count($prices); $i++) {
+                $dailyReturns[] = (($prices[$i] - $prices[$i-1]) / $prices[$i-1]) * 100;
+            }
+            
+            // Volatility (standard deviation of daily returns)
+            $volatility = $this->calculateStdDev($dailyReturns);
+            
+            // Risk-adjusted return (Sharpe-like ratio)
+            $avgReturn = array_sum($dailyReturns) / count($dailyReturns);
+            $riskAdjustedReturn = $volatility > 0 ? ($avgReturn / $volatility) : 0;
+            
+            // Price change
+            $priceChange = $lastPrice - $firstPrice;
+            $priceChangePct = $returnPct;
+            
+            // Highest and lowest in period
+            $highestPrice = max($prices);
+            $lowestPrice = min($prices);
+            
+            $metrics[$code] = [
+                'kode_saham' => $code,
+                'nama_saham' => $latest->nama_saham,
+                'sektor' => $latest->sektor,
+                'harga_terakhir' => floatval($latest->harga_tutup),
+                'volume' => intval($latest->volume),
+                'eps' => floatval($latest->EPS),
+                'per' => floatval($latest->PER),
+                'roe' => floatval($latest->ROE),
+                'return_pct' => round($returnPct, 2),
+                'volatility' => round($volatility, 2),
+                'risk_adjusted_return' => round($riskAdjustedReturn, 2),
+                'price_change' => round($priceChange, 2),
+                'price_change_pct' => round($priceChangePct, 2),
+                'highest_price' => round($highestPrice, 2),
+                'lowest_price' => round($lowestPrice, 2),
+                'tanggal' => $latest->tanggal
+            ];
+        }
+        
+        return $metrics;
+    }
+
+    /**
+     * Calculate standard deviation
+     * @param array $values
+     * @return float
+     */
+    private function calculateStdDev($values)
+    {
+        if (empty($values)) return 0;
+        
+        $mean = array_sum($values) / count($values);
+        $variance = array_sum(array_map(function($x) use ($mean) {
+            return pow($x - $mean, 2);
+        }, $values)) / count($values);
+        
+        return sqrt($variance);
+    }
 }
 
 
