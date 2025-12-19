@@ -170,9 +170,14 @@
                 </div>
                 <div class="col-lg-4 col-md-12 mb-3">
                     <label class="control-label">&nbsp;</label>
-                    <button id="downloadBtn" class="btn btn-download-data w-100">
-                        <i class="fas fa-download me-2"></i>Download Data CSV
-                    </button>
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button id="downloadBtn" class="btn btn-download-data me-md-2 flex-fill">
+                            <i class="fas fa-download me-2"></i>Download Data CSV
+                        </button>
+                        <button id="btnUpdateData" class="btn btn-outline-primary flex-fill" data-bs-toggle="modal" data-bs-target="#modalUpdateData">
+                            <i class="fas fa-sync-alt me-2"></i>Update Data Saham
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -477,3 +482,261 @@
 
 <!-- Sector Analysis Script -->
 <script src="<?= ASSETS_URL; ?>js/sector-analysis.js"></script>
+
+<!-- Update Data Modal -->
+<div class="modal fade" id="modalUpdateData" tabindex="-1" aria-labelledby="modalUpdateDataLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalUpdateDataLabel">
+          <i class="fas fa-sync-alt me-2"></i>Update Data Saham Harian
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Content will be implemented later -->
+        <p class="text-muted">Ketika melakukan update data saham mohon jangan menutup menu ini.</p>
+
+
+
+        <!-- Update status and progress -->
+        <div id="updateStatus" class="alert d-none" role="alert"></div>
+
+        <div id="updateProgress" class="d-none mt-3">
+            <div class="progress">
+                <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+            </div>
+            <p id="progressText" class="mt-2 small text-muted">Menunggu...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" id="btnDoUpdateAll" class="btn btn-primary">
+          <i class="fas fa-sync-alt me-2"></i>Update Semua Saham
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const doBtn = document.getElementById('btnDoUpdateAll');
+    if (!doBtn) return;
+
+    doBtn.addEventListener('click', function() {
+        const btn = this;
+        
+        // Helper to ensure update UI elements exist
+        function ensureUpdateElements() {
+            let modalBody = document.querySelector('#modalUpdateData .modal-body');
+            if (!modalBody) modalBody = document.body;
+            
+            let s = document.getElementById('updateStatus');
+            if (!s) {
+                s = document.createElement('div');
+                s.id = 'updateStatus';
+                s.className = 'alert d-none';
+                s.setAttribute('role','alert');
+                modalBody.insertBefore(s, modalBody.firstChild);
+                console.log('Created updateStatus dynamically');
+            }
+            
+            let pDiv = document.getElementById('updateProgress');
+            if (!pDiv) {
+                pDiv = document.createElement('div');
+                pDiv.id = 'updateProgress';
+                pDiv.className = 'mt-3';
+                pDiv.innerHTML = `
+                    <div class="progress">
+                        <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%">0%</div>
+                    </div>
+                    <p id="progressText" class="mt-2 small text-muted">Menunggu...</p>
+                `;
+                modalBody.insertBefore(pDiv, s.nextSibling);
+                console.log('Created updateProgress dynamically');
+            }
+            
+            const pBar = document.getElementById('progressBar');
+            const pText = document.getElementById('progressText');
+            return {statusBox: s, progressDiv: pDiv, progressBar: pBar, progressText: pText};
+        }
+        
+        // Utility escape HTML for safe display
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, function(c) {
+                return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+            });
+        }
+        
+        const els = ensureUpdateElements();
+        const statusBox = els.statusBox;
+        const progressDiv = els.progressDiv;
+        const progressBar = els.progressBar;
+        const progressText = els.progressText;
+        
+        // Disable button
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sedang Update...';
+        
+        // Show progress
+        progressDiv.classList.remove('d-none');
+        statusBox.classList.add('d-none');
+        
+        // Simulate progress
+        let progress = 0;
+        let interval = setInterval(() => {
+            if (progress < 90) {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                progressText.textContent = 'Mengambil data saham... ' + progress + '%';
+            }
+        }, 3000);
+        
+        const formData = new FormData();
+        formData.append('mode', 'all');
+        // Append dry_run if checkbox checked
+        const dryRunCheck = document.getElementById('updateDryRun');
+        if (dryRunCheck && dryRunCheck.checked) formData.append('dry_run', '1');
+        
+        const base = (window.BASEURL || '<?= BASE_URL ?>');
+        const endpoints = [
+            base + '/public/ajax_update_stock.php',
+        ];
+        
+        console.log('Trying endpoints:', endpoints);
+        
+        // Try first endpoint
+        fetch(endpoints[0], {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => {
+            if (!res.ok) {
+                console.warn('First endpoint failed with status:', res.status);
+                // Try fallback
+                return fetch(endpoints[1], {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res2 => {
+                    if (!res2.ok) {
+                        return res2.text().then(t => {
+                            throw new Error('Both endpoints failed. Primary: ' + res.status + ', Fallback: ' + res2.status);
+                        });
+                    }
+                    console.log('Fallback endpoint succeeded');
+                    return res2;
+                });
+            }
+            console.log('Primary endpoint succeeded');
+            return res;
+        })
+        .then(res => res.text())
+        .then(text => {
+            // Stop fake progress
+            clearInterval(interval);
+            progressBar.style.width = '100%';
+            progressBar.textContent = '100%';
+            progressDiv.classList.add('d-none');
+            
+            console.log('Raw response from server:', text);
+            
+            // Try parse JSON - STRIP non-JSON prefix/suffix
+            let data = null;
+            try {
+                // Clean response - remove any non-JSON content before/after
+                let cleanText = text.trim();
+                
+                // Find first { and last }
+                const firstBrace = cleanText.indexOf('{');
+                const lastBrace = cleanText.lastIndexOf('}');
+                
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                    cleanText = cleanText.substring(firstBrace, lastBrace + 1);
+                    console.log('Cleaned JSON:', cleanText);
+                    data = JSON.parse(cleanText);
+                } else {
+                    throw new Error('No valid JSON found in response');
+                }
+            } catch(e) {
+                console.error('Failed to parse JSON:', e);
+                console.error('Raw output:', text);
+                
+                statusBox.className = 'alert alert-danger';
+                statusBox.classList.remove('d-none');
+                statusBox.innerHTML = '<strong>Gagal:</strong> gagal parsing output dari python script<br>' +
+                    '<small>Kemungkinan ada error atau output debug dari server</small>' +
+                    '<pre style="max-height:200px;overflow:auto;background:#f8f9fa;padding:8px;border-radius:4px;margin-top:8px;">' + 
+                    escapeHtml(text) + '</pre>';
+                
+                // Re-enable button
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Update Semua Saham';
+                return;
+            }
+            
+            // If parsed successfully, handle normally
+            if (data && data.success) {
+                statusBox.className = 'alert alert-success';
+                statusBox.classList.remove('d-none');
+                statusBox.innerHTML = 
+                    '<h6><i class="fas fa-check-circle me-2"></i>Update Berhasil!</h6>' +
+                    '<ul class="mb-0 mt-2">' +
+                    '<li>Total Saham: <strong>' + data.total_stocks + '</strong></li>' +
+                    '<li>Berhasil Scrape: <strong>' + data.scraped + '</strong></li>' +
+                    '<li>Data Baru: <strong>' + data.inserted + '</strong></li>' +
+                    '<li>Data Diupdate: <strong>' + data.updated + '</strong></li>' +
+                    (data.failed > 0 ? '<li class="text-danger">Gagal: <strong>' + data.failed + '</strong></li>' : '') +
+                    '<li>Waktu: <strong>' + data.timestamp + '</strong></li>' +
+                    '</ul>';
+                
+                // Close modal and refresh page after 3 seconds
+                setTimeout(() => {
+                    // Close modal
+                    const modal = document.getElementById('modalUpdateData');
+                    if (modal) {
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) {
+                            bsModal.hide();
+                        }
+                    }
+                    
+                    // Refresh page to show updated data
+                    window.location.reload();
+                }, 3000);
+            } else {
+                statusBox.className = 'alert alert-danger';
+                statusBox.classList.remove('d-none');
+                statusBox.innerHTML = '<strong>Gagal:</strong> ' + 
+                    (data && data.message ? data.message : 'Terjadi kesalahan.');
+                
+                if (data && data.raw) {
+                    statusBox.innerHTML += '<pre style="max-height:200px;overflow:auto;background:#f8f9fa;padding:8px;border-radius:4px;margin-top:8px;">' + 
+                        escapeHtml(data.raw) + '</pre>';
+                }
+            }
+            
+            // Enable button
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Update Semua Saham';
+        })
+        .catch(err => {
+            console.error('Post failed:', err);
+            
+            clearInterval(interval);
+            progressDiv.classList.add('d-none');
+            
+            statusBox.className = 'alert alert-danger';
+            statusBox.classList.remove('d-none');
+            statusBox.innerHTML = '<strong>Gagal:</strong> ' + escapeHtml(err.message || String(err));
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Update Semua Saham';
+        });
+    });
+});
+</script>
+
+
