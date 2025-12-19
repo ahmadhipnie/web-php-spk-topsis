@@ -1,0 +1,107 @@
+2025-12-19 14:31:28 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 21
+Using CUSTOM weights: EPS=50%, PER=15%, ROE=35%
+Data saved to session. Investor ID: 10
+Redirecting to hasil...
+
+2025-12-19 14:37:03 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 1
+Using DEFAULT weights for profile: agresif
+2025-12-19 14:38:59 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+ERROR: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'db_rekomendasi_saham.s1.id_saham' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+TRACE: #0 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\core\Database.php(76): PDOStatement->execute()
+#1 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\core\Database.php(85): Database->execute()
+#2 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\app\models\SahamModel.php(166): Database->resultSet()
+#3 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\app\controllers\TopsisController.php(69): SahamModel->getSahamForTopsis('semua', 50000000.0)
+#4 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\core\App.php(61): TopsisController->hitung()
+#5 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\index.php(41): App->__construct()
+#6 {main}
+
+2025-12-19 14:42:57 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+ERROR: SQLSTATE[42000]: Syntax error or access violation: 1055 Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'db_rekomendasi_saham.s1.id_saham' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+TRACE: #0 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\core\Database.php(76): PDOStatement->execute()
+#1 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\core\Database.php(85): Database->execute()
+#2 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\app\models\SahamModel.php(166): Database->resultSet()
+#3 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\app\controllers\TopsisController.php(69): SahamModel->getSahamForTopsis('semua', 50000000.0)
+#4 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\core\App.php(61): TopsisController->hitung()
+#5 C:\Users\david\Documents\my private document\jokian\2025-12-10_CL56_analisis_saham_topsis_phpNative\projects\spk-saham-topsis\index.php(41): App->__construct()
+#6 {main}
+
+2025-12-19 14:43:15 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 21
+Using DEFAULT weights for profile: agresif
+Data saved to session. Investor ID: 11
+Redirecting to hasil...
+
+2025-12-19 14:44:02 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 21
+Using DEFAULT weights for profile: agresif
+Data saved to session. Investor ID: 12
+Redirecting to hasil...
+
+2025-12-19 14:44:32 - TOPSIS Start
+Input - Nama: tester, Budget: 1000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 21
+Using DEFAULT weights for profile: agresif
+Data saved to session. Investor ID: 13
+Redirecting to hasil...
+
+2025-12-19 14:48:37 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 1
+Using DEFAULT weights for profile: agresif
+2025-12-19 14:50:30 - TOPSIS Start
+Input - Nama: tester, Budget: 50000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 19
+Using DEFAULT weights for profile: agresif
+Data saved to session. Investor ID: 14
+Redirecting to hasil...
+
+2025-12-19 14:51:19 - TOPSIS Start
+Input - Nama: tester, Budget: 1000000, Profil: konservatif, Sektor: semua
+Saham ditemukan: 19
+Using DEFAULT weights for profile: konservatif
+Data saved to session. Investor ID: 15
+Redirecting to hasil...
+
+2025-12-19 14:52:34 - TOPSIS Start
+Input - Nama: tester, Budget: 1000000, Profil: agresif, Sektor: semua
+Saham ditemukan: 19
+Using DEFAULT weights for profile: agresif
+Data saved to session. Investor ID: 16
+Redirecting to hasil...
+
+2025-12-19 14:53:06 - TOPSIS Start
+Input - Nama: tester, Budget: 1000000, Profil: agresif, Sektor: perbankan
+Saham ditemukan: 4
+Using DEFAULT weights for profile: agresif
+Data saved to session. Investor ID: 17
+Redirecting to hasil...
+
+2025-12-19 14:53:46 - TOPSIS Start
+Input - Nama: tester, Budget: 1000000, Profil: agresif, Sektor: teknologi
+Saham ditemukan: 1
+Using DEFAULT weights for profile: agresif
+Data saved to session. Investor ID: 18
+Redirecting to hasil...
+
+2025-12-19 14:54:39 - TOPSIS Start
+Input - Nama: tester, Budget: 1000000, Profil: konservatif, Sektor: perbankan
+Saham ditemukan: 4
+Using DEFAULT weights for profile: konservatif
+Data saved to session. Investor ID: 19
+Redirecting to hasil...
+
+2025-12-19 14:59:16 - TOPSIS Start
+Input - Nama: tester, Budget: 1000000, Profil: konservatif, Sektor: semua
+Saham ditemukan: 19
+Using DEFAULT weights for profile: konservatif
+Data saved to session. Investor ID: 20
+Redirecting to hasil...
+

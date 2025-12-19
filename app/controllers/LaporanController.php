@@ -19,32 +19,40 @@ class LaporanController extends Controller
         header('Content-Type: application/json');
 
         try {
-            $periode = $_GET['periode'] ?? '30';
-            
+            // Ensure periode is integer
+            $periode = isset($_GET['periode']) ? (int)$_GET['periode'] : 30;
+
+            // Validate periode (must be numeric and positive)
+            if ($periode <= 0) {
+                $periode = 30;
+            }
+
             // Calculate date ranges
             $tanggal_akhir = date('Y-m-d');
             $tanggal_mulai = date('Y-m-d', strtotime("-$periode days"));
-            
+
             // For weekly comparison
             $week_ago_start = date('Y-m-d', strtotime("-" . ($periode * 2) . " days"));
             $week_ago_end = date('Y-m-d', strtotime("-$periode days"));
 
             // 1. Get Top 10 Stocks by Return
             $topStocks = $this->sahamModel->getTopStocksByReturn($tanggal_mulai, $tanggal_akhir, 10);
-            
+
             // 2. Get Weekly Ranking Comparison (for top 10 stocks)
-            $stockCodes = array_map(function($stock) { return $stock->kode_saham; }, $topStocks);
+            $stockCodes = array_map(function ($stock) {
+                return $stock->kode_saham;
+            }, $topStocks);
             $previousRanking = $this->sahamModel->getStockRanking($week_ago_start, $week_ago_end, $stockCodes);
-            
+
             // Merge with ranking changes
             $topStocksWithChanges = [];
             foreach ($topStocks as $index => $stock) {
                 $currentRank = $index + 1;
                 $previousRank = $this->findPreviousRank($stock->kode_saham, $previousRanking);
-                
+
                 $rankChange = 0;
                 $rankStatus = 'new';
-                
+
                 if ($previousRank !== null) {
                     $rankChange = $previousRank - $currentRank; // Positive = naik, Negative = turun
                     if ($rankChange > 0) {
@@ -55,7 +63,7 @@ class LaporanController extends Controller
                         $rankStatus = 'same';
                     }
                 }
-                
+
                 $topStocksWithChanges[] = [
                     'rank' => $currentRank,
                     'kode_saham' => $stock->kode_saham,
@@ -75,14 +83,14 @@ class LaporanController extends Controller
 
             // 3. Get Sector Performance
             $sectorPerformance = $this->sahamModel->getSectorPerformance($tanggal_mulai, $tanggal_akhir);
-            
+
             // Calculate average return per sector
             $sectors = [];
             foreach ($sectorPerformance as $row) {
                 $sektor = $row->sektor;
                 $harga_awal = floatval($row->harga_awal);
                 $harga_akhir = floatval($row->harga_akhir);
-                
+
                 if ($harga_awal > 0) {
                     $return = (($harga_akhir - $harga_awal) / $harga_awal) * 100;
                 } else {
@@ -112,7 +120,7 @@ class LaporanController extends Controller
             }
 
             // Sort by avg_return descending
-            usort($sectorData, function($a, $b) {
+            usort($sectorData, function ($a, $b) {
                 return $b['avg_return'] <=> $a['avg_return'];
             });
 
@@ -140,7 +148,6 @@ class LaporanController extends Controller
                     'summary' => $summary
                 ]
             ]);
-
         } catch (Exception $e) {
             echo json_encode([
                 'success' => false,
@@ -156,8 +163,14 @@ class LaporanController extends Controller
     public function downloadPDF()
     {
         try {
-            $periode = $_GET['periode'] ?? '30';
-            
+            // Ensure periode is integer
+            $periode = isset($_GET['periode']) ? (int)$_GET['periode'] : 30;
+
+            // Validate periode
+            if ($periode <= 0) {
+                $periode = 30;
+            }
+
             // Get report data
             $_GET['periode'] = $periode;
             ob_start();
@@ -178,7 +191,7 @@ class LaporanController extends Controller
             // Output as printable HTML (user can save as PDF from browser)
             header('Content-Type: text/html; charset=utf-8');
             header('Content-Disposition: inline; filename="Laporan_Saham_' . date('Ymd_His') . '.html"');
-            
+
             echo '<!DOCTYPE html>
 <html>
 <head>
@@ -255,7 +268,6 @@ class LaporanController extends Controller
 </body>
 </html>';
             exit;
-
         } catch (Exception $e) {
             die('Error generating PDF: ' . $e->getMessage());
         }
@@ -268,8 +280,14 @@ class LaporanController extends Controller
     public function downloadCSV()
     {
         try {
-            $periode = $_GET['periode'] ?? '30';
-            
+            // Ensure periode is integer
+            $periode = isset($_GET['periode']) ? (int)$_GET['periode'] : 30;
+
+            // Validate periode
+            if ($periode <= 0) {
+                $periode = 30;
+            }
+
             // Get report data
             $_GET['periode'] = $periode;
             ob_start();
@@ -291,7 +309,7 @@ class LaporanController extends Controller
             $output = fopen('php://output', 'w');
 
             // Write BOM for Excel UTF-8 compatibility
-            fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+            fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             // Section 1: Summary
             fputcsv($output, ['=== RINGKASAN LAPORAN ===']);
@@ -306,7 +324,7 @@ class LaporanController extends Controller
             // Section 2: Top Stocks
             fputcsv($output, ['=== TOP 10 SAHAM TERBAIK ===']);
             fputcsv($output, ['Rank', 'Kode', 'Nama Saham', 'Sektor', 'Return (%)', 'Harga Awal', 'Harga Akhir', 'EPS', 'PER', 'ROE', 'Perubahan Rank', 'Status']);
-            
+
             foreach ($data['top_stocks'] as $stock) {
                 $rankChangeText = '';
                 if ($stock['rank_status'] === 'up') {
@@ -318,7 +336,7 @@ class LaporanController extends Controller
                 } else {
                     $rankChangeText = 'New';
                 }
-                
+
                 fputcsv($output, [
                     $stock['rank'],
                     $stock['kode_saham'],
@@ -334,13 +352,13 @@ class LaporanController extends Controller
                     ucfirst($stock['rank_status'])
                 ]);
             }
-            
+
             fputcsv($output, []);
 
             // Section 3: Sector Performance
             fputcsv($output, ['=== PERFORMA SEKTOR ===']);
             fputcsv($output, ['Sektor', 'Rata-rata Return (%)', 'Jumlah Saham']);
-            
+
             foreach ($data['all_sectors'] as $sector) {
                 fputcsv($output, [
                     $sector['sektor'],
@@ -351,7 +369,6 @@ class LaporanController extends Controller
 
             fclose($output);
             exit;
-
         } catch (Exception $e) {
             die('Error generating CSV: ' . $e->getMessage());
         }
@@ -428,7 +445,7 @@ class LaporanController extends Controller
         foreach ($data['top_stocks'] as $stock) {
             $rankIcon = '';
             $rankClass = '';
-            
+
             if ($stock['rank_status'] === 'up') {
                 $rankIcon = '↑ +' . $stock['rank_change'];
                 $rankClass = 'text-success';
@@ -442,9 +459,9 @@ class LaporanController extends Controller
                 $rankIcon = '★ Baru';
                 $rankClass = 'text-primary';
             }
-            
+
             $returnClass = $stock['return'] >= 0 ? 'text-success' : 'text-danger';
-            
+
             $html .= '
     <tr>
         <td style="text-align: center; font-weight: bold;">' . $stock['rank'] . '</td>

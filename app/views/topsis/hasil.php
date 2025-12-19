@@ -35,8 +35,8 @@
                     <div class="kriteria-info-card">
                         <div class="kriteria-label">Profil Risiko</div>
                         <div class="kriteria-value">
-                            <?= isset($data['investorData']['use_custom_weight']) && $data['investorData']['use_custom_weight'] 
-                                ? 'Custom' 
+                            <?= isset($data['investorData']['use_custom_weight']) && $data['investorData']['use_custom_weight']
+                                ? 'Custom'
                                 : ucfirst($data['investorData']['profil_risiko']); ?>
                         </div>
                         <div class="kriteria-detail">Tingkat toleransi risiko</div>
@@ -148,7 +148,7 @@
                                         if ($hargaBuka > 0) {
                                             $kinerja = (($hargaTutup - $hargaBuka) / $hargaBuka) * 100;
                                         }
-                                        
+
                                         if ($kinerja > 0) {
                                             echo '<i class="fas fa-arrow-up"></i> ' . number_format($kinerja, 2) . '%';
                                         } elseif ($kinerja < 0) {
@@ -156,7 +156,7 @@
                                         } else {
                                             echo '<i class="fas fa-minus"></i> 0.00%';
                                         }
-                                        
+
                                         // Logika Saran Sistem berdasarkan Skor TOPSIS + Kinerja
                                         if ($s['skor'] >= 0.6 && $kinerja >= 0) {
                                             $saranSistem = 'Buy';
@@ -176,7 +176,7 @@
                                         }
                                         ?>
                                     </div>
-                                    
+
                                     <!-- Saran Sistem Badge -->
                                     <div class="score-recommendation">
                                         <span class="recommendation-badge <?= $saranClass; ?>">
@@ -199,19 +199,19 @@
                             <div class="saham-details">
                                 <div class="detail-item">
                                     <div class="detail-label">EPS (Earnings Per Share)</div>
-                                    <div class="detail-value"><?= number_format($s['eps'], 2); ?></div>
+                                    <div class="detail-value"><?= number_format($s['eps'] ?? 0, 2); ?></div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">PER (Price Earnings Ratio)</div>
-                                    <div class="detail-value"><?= number_format($s['per'], 2); ?>x</div>
+                                    <div class="detail-value"><?= number_format($s['per'] ?? 0, 2); ?>x</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">ROE (Return on Equity)</div>
-                                    <div class="detail-value"><?= number_format($s['roe'], 2); ?>%</div>
+                                    <div class="detail-value"><?= number_format($s['roe'] ?? 0, 2); ?>%</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Harga Saham (Tutup)</div>
-                                    <div class="detail-value">Rp <?= number_format($s['harga_tutup'], 0, ',', '.'); ?></div>
+                                    <div class="detail-value">Rp <?= number_format($s['harga_tutup'] ?? 0, 0, ',', '.'); ?></div>
                                 </div>
                             </div>
 
@@ -241,16 +241,16 @@
 
         <!-- Action Buttons -->
         <?php if (!empty($data['hasilTopsis'])): ?>
-        <div class="row mt-4">
-            <div class="col-12 text-center">
-                <a href="<?= BASE_URL; ?>topsis" class="btn btn-outline-primary me-2">
-                    <i class="fas fa-redo"></i> Analisis Baru
-                </a>
-                <a href="<?= BASE_URL; ?>" class="btn btn-primary">
-                    <i class="fas fa-home"></i> Kembali ke Beranda
-                </a>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="<?= BASE_URL; ?>topsis" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-redo"></i> Analisis Baru
+                    </a>
+                    <a href="<?= BASE_URL; ?>" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Kembali ke Beranda
+                    </a>
+                </div>
             </div>
-        </div>
         <?php endif; ?>
     </div>
 </section>
