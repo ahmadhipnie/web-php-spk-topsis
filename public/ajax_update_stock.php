@@ -3,6 +3,9 @@
 // PENTING: Jangan ada output apapun sebelum baris ini!
 // ============================================================
 
+// Set maximum execution time (5 menit untuk scraping)
+set_time_limit(300);
+
 // Set header JSON dan suppress error display
 header('Content-Type: application/json; charset=utf-8');
 ini_set('display_errors', 0);
@@ -30,7 +33,7 @@ $mode = isset($_POST['mode']) ? $_POST['mode'] : 'single';
 if (!$dryRun && !file_exists($scriptPath)) {
     // Clean any output buffer
     ob_clean();
-    
+
     echo json_encode([
         'success' => false,
         'message' => 'Python script not found at: ' . $scriptPath
@@ -55,7 +58,7 @@ try {
 
 if ($mode === 'all') {
     // ========== MODE UPDATE SEMUA SAHAM ==========
-    
+
     if ($dryRun) {
         ob_clean();
         echo json_encode([
@@ -64,9 +67,9 @@ if ($mode === 'all') {
             'success_count' => 3,
             'failed_count' => 0,
             'data' => [
-                ['tanggal' => date('Y-m-d'), 'kode_saham' => 'BBCA', 'nama_saham' => 'Bank Central Asia', 'sektor' => 'Perbankan', 'harga_buka' => 9000, 'harga_tertinggi' => 9100, 'harga_terendah' => 8900, 'harga_tutup' => 9050, 'volume' => 10000, 'eps'=> 850, 'per'=> 12.5, 'roe'=> 18.2],
-                ['tanggal' => date('Y-m-d'), 'kode_saham' => 'BBRI', 'nama_saham' => 'Bank Rakyat Indonesia', 'sektor' => 'Perbankan', 'harga_buka' => 5000, 'harga_tertinggi' => 5100, 'harga_terendah' => 4900, 'harga_tutup' => 5050, 'volume' => 15000, 'eps'=> 600, 'per'=> 10.2, 'roe'=> 16.5],
-                ['tanggal' => date('Y-m-d'), 'kode_saham' => 'TLKM', 'nama_saham' => 'Telkom Indonesia', 'sektor' => 'Telekomunikasi', 'harga_buka' => 4000, 'harga_tertinggi' => 4100, 'harga_terendah' => 3900, 'harga_tutup' => 4050, 'volume' => 20000, 'eps'=> 280, 'per'=> 11.2, 'roe'=> 14.8]
+                ['tanggal' => date('Y-m-d'), 'kode_saham' => 'BBCA', 'nama_saham' => 'Bank Central Asia', 'sektor' => 'Perbankan', 'harga_buka' => 9000, 'harga_tertinggi' => 9100, 'harga_terendah' => 8900, 'harga_tutup' => 9050, 'volume' => 10000, 'eps' => 850, 'per' => 12.5, 'roe' => 18.2],
+                ['tanggal' => date('Y-m-d'), 'kode_saham' => 'BBRI', 'nama_saham' => 'Bank Rakyat Indonesia', 'sektor' => 'Perbankan', 'harga_buka' => 5000, 'harga_tertinggi' => 5100, 'harga_terendah' => 4900, 'harga_tutup' => 5050, 'volume' => 15000, 'eps' => 600, 'per' => 10.2, 'roe' => 16.5],
+                ['tanggal' => date('Y-m-d'), 'kode_saham' => 'TLKM', 'nama_saham' => 'Telkom Indonesia', 'sektor' => 'Telekomunikasi', 'harga_buka' => 4000, 'harga_tertinggi' => 4100, 'harga_terendah' => 3900, 'harga_tutup' => 4050, 'volume' => 20000, 'eps' => 280, 'per' => 11.2, 'roe' => 14.8]
             ],
             'timestamp' => date('Y-m-d H:i:s')
         ]);
@@ -74,7 +77,8 @@ if ($mode === 'all') {
     }
 
     // Helper for quoting arguments cross-platform
-    function shell_quote($arg) {
+    function shell_quote($arg)
+    {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             // Use double quotes on Windows
             return '"' . str_replace('"', '\\"', $arg) . '"';
@@ -84,32 +88,32 @@ if ($mode === 'all') {
 
     // Build command safely (quote appropriately for OS)
     $cmd = shell_quote($pythonBin) . ' ' . shell_quote($scriptPath);
-    
+
     // Include stderr in output for debugging
     $cmd .= ' 2>&1';
-    
+
     // Execute Python script
     exec($cmd, $outputLines, $exitCode);
     $output = implode("\n", $outputLines);
-    
+
     // Log raw output for debugging (optional - comment out in production)
     error_log("Python output: " . $output);
     error_log("Exit code: " . $exitCode);
-    
+
     // Clean output - remove any non-JSON content
     $cleanOutput = trim($output);
-    
+
     // Find JSON in output (in case there's extra text)
     $firstBrace = strpos($cleanOutput, '{');
     $lastBrace = strrpos($cleanOutput, '}');
-    
+
     if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
         $cleanOutput = substr($cleanOutput, $firstBrace, $lastBrace - $firstBrace + 1);
     }
-    
+
     // Try decode JSON
     $data = json_decode($cleanOutput, true);
-    
+
     if (!is_array($data) || empty($data) || !isset($data['success'])) {
         ob_clean();
         echo json_encode([
@@ -121,7 +125,7 @@ if ($mode === 'all') {
         ]);
         exit;
     }
-    
+
     if (!$data['success']) {
         ob_clean();
         echo json_encode([
@@ -131,12 +135,12 @@ if ($mode === 'all') {
         ]);
         exit;
     }
-    
+
     // Insert/Update data ke database
     $inserted = 0;
     $updated = 0;
     $failed = 0;
-    
+
     if (isset($data['data']) && is_array($data['data'])) {
         foreach ($data['data'] as $stock) {
             try {
@@ -149,7 +153,7 @@ if ($mode === 'all') {
                     ':kode' => $stock['kode_saham']
                 ]);
                 $existing = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 if ($existing) {
                     // UPDATE
                     $sql = "UPDATE saham SET
@@ -211,7 +215,7 @@ if ($mode === 'all') {
             }
         }
     }
-    
+
     // Clean buffer and send final response
     ob_clean();
     echo json_encode([
@@ -223,11 +227,10 @@ if ($mode === 'all') {
         'failed' => $failed,
         'timestamp' => $data['timestamp'] ?? date('Y-m-d H:i:s')
     ]);
-    
 } else {
     // ========== MODE UPDATE 1 SAHAM ==========
     $kode = isset($_POST['kode_saham']) ? strtoupper(trim($_POST['kode_saham'])) : '';
-    
+
     if ($kode === '') {
         ob_clean();
         echo json_encode([
@@ -236,7 +239,7 @@ if ($mode === 'all') {
         ]);
         exit;
     }
-    
+
     if ($dryRun) {
         ob_clean();
         echo json_encode([
@@ -263,18 +266,18 @@ if ($mode === 'all') {
     $cmd = shell_quote($pythonBin) . ' ' . shell_quote($scriptPath) . ' ' . shell_quote($kode) . ' 2>&1';
     exec($cmd, $outputLines, $exitCode);
     $output = implode("\n", $outputLines);
-    
+
     // Clean output
     $cleanOutput = trim($output);
     $firstBrace = strpos($cleanOutput, '{');
     $lastBrace = strrpos($cleanOutput, '}');
-    
+
     if ($firstBrace !== false && $lastBrace !== false) {
         $cleanOutput = substr($cleanOutput, $firstBrace, $lastBrace - $firstBrace + 1);
     }
-    
+
     $data = json_decode($cleanOutput, true);
-    
+
     if (!is_array($data) || empty($data) || !isset($data['success']) || !$data['success']) {
         ob_clean();
         echo json_encode([
@@ -285,9 +288,9 @@ if ($mode === 'all') {
         ]);
         exit;
     }
-    
+
     $stock = $data['data'];
-    
+
     try {
         $sqlCheck = "SELECT id_saham FROM saham WHERE tanggal = :tanggal AND kode_saham = :kode";
         $stmt = $dbh->prepare($sqlCheck);
@@ -296,7 +299,7 @@ if ($mode === 'all') {
             ':kode' => $stock['kode_saham']
         ]);
         $existing = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($existing) {
             // UPDATE
             $sql = "UPDATE saham SET
@@ -353,14 +356,13 @@ if ($mode === 'all') {
             $stmt->execute($params);
             $mode = 'insert';
         }
-        
+
         ob_clean();
         echo json_encode([
             'success' => true,
             'mode' => $mode,
             'data' => $stock
         ]);
-        
     } catch (Exception $e) {
         ob_clean();
         echo json_encode([
@@ -373,4 +375,3 @@ if ($mode === 'all') {
 // Flush buffer and exit
 ob_end_flush();
 exit;
-?>

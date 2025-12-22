@@ -46,13 +46,13 @@ class SahamController extends Controller
             foreach ($data as $row) {
                 $timestamp = strtotime($row->tanggal) * 1000; // Convert to milliseconds
                 $chartData['dates'][] = date('Y-m-d', strtotime($row->tanggal));
-                
+
                 // Data untuk line chart
                 $chartData['prices']['open'][] = floatval($row->harga_buka);
                 $chartData['prices']['high'][] = floatval($row->harga_tertinggi);
                 $chartData['prices']['low'][] = floatval($row->harga_terendah);
                 $chartData['prices']['close'][] = floatval($row->harga_tutup);
-                
+
                 // Data untuk candlestick
                 $chartData['ohlc'][] = [
                     'x' => $timestamp,
@@ -63,7 +63,7 @@ class SahamController extends Controller
                         floatval($row->harga_tutup)
                     ]
                 ];
-                
+
                 // Data volume
                 $chartData['volume'][] = [
                     'x' => $timestamp,
@@ -103,7 +103,7 @@ class SahamController extends Controller
 
         try {
             $stocks = $this->sahamModel->getAvailableStocks();
-            
+
             echo json_encode([
                 'success' => true,
                 'data' => $stocks
@@ -122,8 +122,8 @@ class SahamController extends Controller
      */
     public function downloadCSV()
     {
-        $kode_saham = $_GET['kode_saham'] ?? 'BBCA';
-        $periode = $_GET['periode'] ?? '30';
+        $kode_saham = isset($_GET['kode_saham']) ? strtoupper($_GET['kode_saham']) : 'BBCA';
+        $periode = isset($_GET['periode']) ? (int)$_GET['periode'] : 30;
 
         $tanggal_akhir = date('Y-m-d');
         $tanggal_mulai = date('Y-m-d', strtotime("-$periode days"));
@@ -131,12 +131,22 @@ class SahamController extends Controller
         try {
             $data = $this->sahamModel->getStockHistorical($kode_saham, $tanggal_mulai, $tanggal_akhir);
 
+            if (empty($data)) {
+                echo "Tidak ada data untuk saham $kode_saham dalam periode tersebut.";
+                exit;
+            }
+
             // Set headers untuk download
             header('Content-Type: text/csv; charset=utf-8');
             header('Content-Disposition: attachment; filename="' . $kode_saham . '_' . date('Ymd') . '.csv"');
+            header('Pragma: no-cache');
+            header('Expires: 0');
 
             // Buka output stream
             $output = fopen('php://output', 'w');
+
+            // Tulis BOM untuk UTF-8 (agar Excel bisa baca dengan benar)
+            fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             // Tulis header CSV
             fputcsv($output, ['Tanggal', 'Kode Saham', 'Harga Buka', 'Harga Tertinggi', 'Harga Terendah', 'Harga Tutup', 'Volume', 'Kinerja (%)']);
@@ -163,7 +173,9 @@ class SahamController extends Controller
             fclose($output);
             exit;
         } catch (Exception $e) {
-            echo "Error: " . $e->getMessage();
+            header('Content-Type: text/plain; charset=utf-8');
+            echo "Error downloading CSV: " . $e->getMessage();
+            exit;
         }
     }
 

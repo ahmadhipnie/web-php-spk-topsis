@@ -122,40 +122,36 @@ class SahamModel
      */
     public function getSahamForTopsis($sektor = 'semua', $budget = 0)
     {
-        // Query untuk ambil data terbaru per kode saham (berdasarkan tanggal)
+        // Query dengan LEFT JOIN untuk memastikan hanya ambil record terbaru per kode_saham
+        // Tidak ada duplikasi karena LEFT JOIN + WHERE b.id_saham IS NULL
         if ($sektor === 'semua') {
-            $query = "SELECT s1.* FROM " . $this->table . " s1
-                      INNER JOIN (
-                          SELECT kode_saham, MAX(tanggal) as max_tanggal
-                          FROM " . $this->table . "
-                          WHERE harga_tutup <= :budget 
-                          AND EPS IS NOT NULL 
-                          AND PER IS NOT NULL 
-                          AND ROE IS NOT NULL
-                          GROUP BY kode_saham
-                      ) s2 ON s1.kode_saham = s2.kode_saham AND s1.tanggal = s2.max_tanggal
-                      WHERE s1.harga_tutup <= :budget
-                      ORDER BY s1.harga_tutup ASC";
+            $query = "SELECT a.* FROM " . $this->table . " a
+                      LEFT JOIN " . $this->table . " b 
+                        ON a.kode_saham = b.kode_saham 
+                        AND (a.tanggal < b.tanggal OR (a.tanggal = b.tanggal AND a.id_saham < b.id_saham))
+                      WHERE b.id_saham IS NULL
+                      AND a.harga_tutup <= :budget 
+                      AND a.EPS IS NOT NULL 
+                      AND a.PER IS NOT NULL 
+                      AND a.ROE IS NOT NULL
+                      ORDER BY a.harga_tutup ASC";
         } else {
-            $query = "SELECT s1.* FROM " . $this->table . " s1
-                      INNER JOIN (
-                          SELECT kode_saham, MAX(tanggal) as max_tanggal
-                          FROM " . $this->table . "
-                          WHERE sektor = :sektor 
-                          AND harga_tutup <= :budget 
-                          AND EPS IS NOT NULL 
-                          AND PER IS NOT NULL 
-                          AND ROE IS NOT NULL
-                          GROUP BY kode_saham
-                      ) s2 ON s1.kode_saham = s2.kode_saham AND s1.tanggal = s2.max_tanggal
-                      WHERE s1.sektor = :sektor 
-                      AND s1.harga_tutup <= :budget
-                      ORDER BY s1.harga_tutup ASC";
+            $query = "SELECT a.* FROM " . $this->table . " a
+                      LEFT JOIN " . $this->table . " b 
+                        ON a.kode_saham = b.kode_saham 
+                        AND (a.tanggal < b.tanggal OR (a.tanggal = b.tanggal AND a.id_saham < b.id_saham))
+                      WHERE b.id_saham IS NULL
+                      AND a.sektor = :sektor
+                      AND a.harga_tutup <= :budget 
+                      AND a.EPS IS NOT NULL 
+                      AND a.PER IS NOT NULL 
+                      AND a.ROE IS NOT NULL
+                      ORDER BY a.harga_tutup ASC";
         }
 
         $this->db->query($query);
         $this->db->bind(':budget', $budget);
-        
+
         if ($sektor !== 'semua') {
             $this->db->bind(':sektor', $sektor);
         }
@@ -253,7 +249,7 @@ class SahamModel
     public function getInvestorById($id_investor)
     {
         $query = "SELECT * FROM investor WHERE id_investor = :id_investor";
-        
+
         $this->db->query($query);
         $this->db->bind(':id_investor', $id_investor);
 
@@ -274,7 +270,7 @@ class SahamModel
                   AND tanggal >= :tanggal_mulai 
                   AND tanggal <= :tanggal_akhir 
                   ORDER BY tanggal ASC";
-        
+
         $this->db->query($query);
         $this->db->bind(':kode_saham', $kode_saham);
         $this->db->bind(':tanggal_mulai', $tanggal_mulai);
@@ -292,7 +288,7 @@ class SahamModel
         $query = "SELECT DISTINCT kode_saham, nama_saham, sektor 
                   FROM " . $this->table . " 
                   ORDER BY kode_saham ASC";
-        
+
         $this->db->query($query);
         return $this->db->resultSet();
     }
@@ -321,11 +317,11 @@ class SahamModel
                   FROM (SELECT DISTINCT kode_saham, nama_saham, sektor 
                         FROM " . $this->table . ") s
                   ORDER BY s.sektor, s.kode_saham";
-        
+
         $this->db->query($query);
         $this->db->bind(':tanggal_mulai', $tanggal_mulai);
         $this->db->bind(':tanggal_akhir', $tanggal_akhir);
-        
+
         return $this->db->resultSet();
     }
 
@@ -360,13 +356,13 @@ class SahamModel
                   HAVING harga_awal IS NOT NULL AND harga_akhir IS NOT NULL
                   ORDER BY ((harga_akhir - harga_awal) / harga_awal) DESC
                   LIMIT :limit";
-        
+
         $this->db->query($query);
         $this->db->bind(':sektor', $sektor);
         $this->db->bind(':tanggal_mulai', $tanggal_mulai);
         $this->db->bind(':tanggal_akhir', $tanggal_akhir);
         $this->db->bind(':limit', $limit);
-        
+
         return $this->db->resultSet();
     }
 
@@ -380,7 +376,7 @@ class SahamModel
                   FROM " . $this->table . " 
                   WHERE sektor IS NOT NULL
                   ORDER BY sektor ASC";
-        
+
         $this->db->query($query);
         return $this->db->resultSet();
     }
@@ -428,7 +424,7 @@ class SahamModel
                     AND return_pct IS NOT NULL
                   ORDER BY return_pct DESC
                   LIMIT :limit";
-        
+
         $this->db->query($query);
         $this->db->bind(':tanggal_mulai', $tanggal_mulai);
         $this->db->bind(':tanggal_akhir', $tanggal_akhir);
@@ -436,7 +432,7 @@ class SahamModel
         $this->db->bind(':tanggal_mulai2', $tanggal_mulai);
         $this->db->bind(':tanggal_mulai3', $tanggal_mulai);
         $this->db->bind(':limit', $limit);
-        
+
         return $this->db->resultSet();
     }
 
@@ -455,7 +451,7 @@ class SahamModel
             $placeholders = implode(',', array_fill(0, count($stockCodes), '?'));
             $whereClause = " AND kode_saham IN ($placeholders)";
         }
-        
+
         $query = "SELECT 
                     kode_saham,
                     nama_saham,
@@ -482,13 +478,13 @@ class SahamModel
                     AND harga_akhir IS NOT NULL
                     AND harga_awal > 0
                   ORDER BY return_pct DESC";
-        
+
         $this->db->query($query);
-        
+
         // Bind date parameters
         $this->db->bind(1, $tanggal_mulai);
         $this->db->bind(2, $tanggal_akhir);
-        
+
         // Bind stock codes if provided
         if (!empty($stockCodes)) {
             $paramIndex = 3;
@@ -496,107 +492,136 @@ class SahamModel
                 $this->db->bind($paramIndex++, $code);
             }
         }
-        
+
         return $this->db->resultSet();
     }
 
     /**
      * Get market overview data for hero section
      * Returns: last update date, stock count, top gainer, top loser, average return (7 days)
+     * NEW: Reads from saham_topsis table with last_updated field
      */
     public function getMarketOverview()
     {
         try {
-            // 1. Get last update date
-            $this->db->query("SELECT MAX(tanggal) as last_update FROM saham");
+            // Default return jika tidak ada data
+            $defaultReturn = [
+                'last_update' => null,
+                'last_update_formatted' => 'Belum Ada Data',
+                'stock_count' => 0,
+                'top_gainer' => null,
+                'top_loser' => null,
+                'average_return' => 0,
+                'market_sentiment' => 'Netral',
+                'sentiment_class' => 'text-secondary',
+                'period' => 'Belum ada data'
+            ];
+
+            // 1. Get last update date from saham table (most reliable)
+            $this->db->query("SELECT MAX(tanggal) as last_update FROM saham WHERE tanggal IS NOT NULL");
             $lastUpdate = $this->db->single();
-            
-            // 2. Get total monitored stocks
-            $this->db->query("SELECT COUNT(DISTINCT kode_saham) as stock_count FROM saham");
+            $lastUpdateValue = $lastUpdate ? $lastUpdate->last_update : null;
+
+            // Jika tidak ada data sama sekali
+            if (!$lastUpdateValue) {
+                return $defaultReturn;
+            }
+
+            // 2. Get total monitored stocks from saham
+            $this->db->query("SELECT COUNT(DISTINCT kode_saham) as stock_count FROM saham WHERE tanggal IS NOT NULL");
             $stockCount = $this->db->single();
-            
-            // 3. Calculate date range (7 days ago)
-            $tanggal_akhir = $lastUpdate->last_update;
-            $tanggal_mulai = date('Y-m-d', strtotime($tanggal_akhir . ' -7 days'));
-            
-            // 4. Get all stocks with their 7-day return
+
+            // 3. Get latest date's data for performance calculation
+            // Get top performers from latest date
             $this->db->query("
                 SELECT 
-                    t1.kode_saham,
-                    MAX(t1.nama_saham) as nama_saham,
-                    (SELECT harga_tutup 
-                     FROM saham t2 
-                     WHERE t2.kode_saham = t1.kode_saham 
-                     AND t2.tanggal >= ?
-                     ORDER BY t2.tanggal ASC 
-                     LIMIT 1) as harga_awal,
-                    (SELECT harga_tutup 
-                     FROM saham t3 
-                     WHERE t3.kode_saham = t1.kode_saham 
-                     AND t3.tanggal <= ?
-                     ORDER BY t3.tanggal DESC 
-                     LIMIT 1) as harga_akhir
-                FROM saham t1
-                GROUP BY t1.kode_saham
+                    kode_saham, 
+                    ((harga_tutup - harga_buka) / harga_buka * 100) as daily_return
+                FROM saham 
+                WHERE tanggal = :latest_date 
+                AND harga_buka > 0
+                ORDER BY daily_return DESC
+                LIMIT 1
             ");
-            
-            $this->db->bind(1, $tanggal_mulai);
-            $this->db->bind(2, $tanggal_akhir);
-            $stocks = $this->db->resultSet();
-            
-            // Calculate returns and filter valid data
-            $validReturns = [];
-            foreach ($stocks as $stock) {
-                if ($stock->harga_awal && $stock->harga_akhir && $stock->harga_awal > 0) {
-                    $return = (($stock->harga_akhir - $stock->harga_awal) / $stock->harga_awal) * 100;
-                    $validReturns[] = [
-                        'kode_saham' => $stock->kode_saham,
-                        'nama_saham' => $stock->nama_saham,
-                        'return' => round($return, 2),
-                        'harga_awal' => $stock->harga_awal,
-                        'harga_akhir' => $stock->harga_akhir
-                    ];
-                }
-            }
-            
-            // Sort by return
-            usort($validReturns, function($a, $b) {
-                return $b['return'] <=> $a['return'];
-            });
-            
-            // 5. Get top gainer (highest positive return)
-            $topGainer = $validReturns[0] ?? null;
-            
-            // 6. Get top loser (lowest/most negative return)
-            $topLoser = end($validReturns) ?: null;
-            
-            // 7. Calculate average market return
-            $totalReturn = array_sum(array_column($validReturns, 'return'));
-            $avgReturn = count($validReturns) > 0 ? round($totalReturn / count($validReturns), 2) : 0;
-            
-            // 8. Determine market sentiment
+            $this->db->bind(':latest_date', $lastUpdateValue);
+            $topGainer = $this->db->single();
+
+            $this->db->query("
+                SELECT 
+                    kode_saham, 
+                    ((harga_tutup - harga_buka) / harga_buka * 100) as daily_return
+                FROM saham 
+                WHERE tanggal = :latest_date 
+                AND harga_buka > 0
+                ORDER BY daily_return ASC
+                LIMIT 1
+            ");
+            $this->db->bind(':latest_date', $lastUpdateValue);
+            $topLoser = $this->db->single();
+
+            // Calculate average return
+            $this->db->query("
+                SELECT AVG((harga_tutup - harga_buka) / harga_buka * 100) as avg_return 
+                FROM saham 
+                WHERE tanggal = :latest_date 
+                AND harga_buka > 0
+            ");
+            $this->db->bind(':latest_date', $lastUpdateValue);
+            $avgReturnData = $this->db->single();
+            $avgReturn = $avgReturnData && $avgReturnData->avg_return ? round($avgReturnData->avg_return, 2) : 0;
+
+            // 4. Determine market sentiment
             $marketSentiment = 'Netral';
             $sentimentClass = 'text-secondary';
-            if ($avgReturn > 2) {
+            if ($avgReturn > 1) {
                 $marketSentiment = 'Bullish';
                 $sentimentClass = 'text-success';
-            } elseif ($avgReturn < -2) {
+            } elseif ($avgReturn < -1) {
                 $marketSentiment = 'Bearish';
                 $sentimentClass = 'text-danger';
             }
-            
+
+            // Format top gainer/loser data
+            $topGainerFormatted = null;
+            if ($topGainer && $topGainer->kode_saham) {
+                $topGainerFormatted = [
+                    'kode_saham' => $topGainer->kode_saham,
+                    'return' => round($topGainer->daily_return, 2)
+                ];
+            }
+
+            $topLoserFormatted = null;
+            if ($topLoser && $topLoser->kode_saham) {
+                $topLoserFormatted = [
+                    'kode_saham' => $topLoser->kode_saham,
+                    'return' => round($topLoser->daily_return, 2)
+                ];
+            }
+
+            // Format last update
+            $lastUpdateFormatted = 'N/A';
+            if ($lastUpdateValue) {
+                // Check if datetime or date
+                if (strpos($lastUpdateValue, ' ') !== false) {
+                    // DateTime format
+                    $lastUpdateFormatted = date('d M Y, H:i', strtotime($lastUpdateValue)) . ' WIB';
+                } else {
+                    // Date only
+                    $lastUpdateFormatted = date('d M Y', strtotime($lastUpdateValue));
+                }
+            }
+
             return [
-                'last_update' => $lastUpdate->last_update,
-                'last_update_formatted' => date('d M Y', strtotime($lastUpdate->last_update)),
-                'stock_count' => $stockCount->stock_count,
-                'top_gainer' => $topGainer,
-                'top_loser' => $topLoser,
+                'last_update' => $lastUpdateValue,
+                'last_update_formatted' => $lastUpdateFormatted,
+                'stock_count' => $stockCount ? $stockCount->stock_count : 0,
+                'top_gainer' => $topGainerFormatted,
+                'top_loser' => $topLoserFormatted,
                 'average_return' => $avgReturn,
                 'market_sentiment' => $marketSentiment,
                 'sentiment_class' => $sentimentClass,
-                'period' => '7 hari terakhir'
+                'period' => 'Hari terakhir'
             ];
-            
         } catch (Exception $e) {
             error_log("Error in getMarketOverview: " . $e->getMessage());
             return null;
@@ -614,10 +639,10 @@ class SahamModel
                   FROM " . $this->table . " 
                   WHERE tanggal = (SELECT MAX(tanggal) FROM " . $this->table . ")
                   ORDER BY kode_saham ASC";
-        
+
         $this->db->query($query);
         $results = $this->db->resultSet();
-        
+
         // If no results (no tanggal column or no data), fallback to simple query
         if (empty($results)) {
             $query = "SELECT DISTINCT kode_saham, 
@@ -626,11 +651,11 @@ class SahamModel
                       FROM " . $this->table . " 
                       ORDER BY kode_saham ASC 
                       LIMIT 50";
-            
+
             $this->db->query($query);
             $results = $this->db->resultSet();
         }
-        
+
         return $results;
     }
 
@@ -643,24 +668,24 @@ class SahamModel
     public function getHistoricalData($stockCodes, $days = 30)
     {
         $placeholders = implode(',', array_fill(0, count($stockCodes), '?'));
-        
+
         $query = "SELECT kode_saham, nama_saham, tanggal, harga_tutup 
                   FROM " . $this->table . " 
                   WHERE kode_saham IN ($placeholders) 
                   AND tanggal >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
                   ORDER BY tanggal ASC, kode_saham ASC";
-        
+
         $this->db->query($query);
-        
+
         // Bind stock codes
         foreach ($stockCodes as $index => $code) {
             $this->db->bind($index + 1, $code);
         }
         // Bind days
         $this->db->bind(count($stockCodes) + 1, $days);
-        
+
         $results = $this->db->resultSet();
-        
+
         // Group by stock code for easier processing
         $grouped = [];
         foreach ($results as $row) {
@@ -676,7 +701,7 @@ class SahamModel
                 'price' => floatval($row->harga_tutup)
             ];
         }
-        
+
         return $grouped;
     }
 
@@ -689,63 +714,65 @@ class SahamModel
     public function getComparisonMetrics($stockCodes, $days = 30)
     {
         $metrics = [];
-        
+
         foreach ($stockCodes as $code) {
             // Get latest data
             $queryLatest = "SELECT * FROM " . $this->table . " 
                            WHERE kode_saham = ? 
                            ORDER BY tanggal DESC 
                            LIMIT 1";
-            
+
             $this->db->query($queryLatest);
             $this->db->bind(1, $code);
             $latest = $this->db->single();
-            
+
             if (!$latest) continue;
-            
+
             // Get historical data for period
             $queryHistory = "SELECT harga_tutup, tanggal 
                             FROM " . $this->table . " 
                             WHERE kode_saham = ? 
                             AND tanggal >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
                             ORDER BY tanggal ASC";
-            
+
             $this->db->query($queryHistory);
             $this->db->bind(1, $code);
             $this->db->bind(2, $days);
             $history = $this->db->resultSet();
-            
+
             if (empty($history)) continue;
-            
+
             // Calculate metrics
-            $prices = array_map(function($row) { return floatval($row->harga_tutup); }, $history);
+            $prices = array_map(function ($row) {
+                return floatval($row->harga_tutup);
+            }, $history);
             $firstPrice = $prices[0];
             $lastPrice = end($prices);
-            
+
             // Return percentage
             $returnPct = (($lastPrice - $firstPrice) / $firstPrice) * 100;
-            
+
             // Calculate daily returns for volatility
             $dailyReturns = [];
             for ($i = 1; $i < count($prices); $i++) {
-                $dailyReturns[] = (($prices[$i] - $prices[$i-1]) / $prices[$i-1]) * 100;
+                $dailyReturns[] = (($prices[$i] - $prices[$i - 1]) / $prices[$i - 1]) * 100;
             }
-            
+
             // Volatility (standard deviation of daily returns)
             $volatility = $this->calculateStdDev($dailyReturns);
-            
+
             // Risk-adjusted return (Sharpe-like ratio)
             $avgReturn = array_sum($dailyReturns) / count($dailyReturns);
             $riskAdjustedReturn = $volatility > 0 ? ($avgReturn / $volatility) : 0;
-            
+
             // Price change
             $priceChange = $lastPrice - $firstPrice;
             $priceChangePct = $returnPct;
-            
+
             // Highest and lowest in period
             $highestPrice = max($prices);
             $lowestPrice = min($prices);
-            
+
             $metrics[$code] = [
                 'kode_saham' => $code,
                 'nama_saham' => $latest->nama_saham,
@@ -765,7 +792,7 @@ class SahamModel
                 'tanggal' => $latest->tanggal
             ];
         }
-        
+
         return $metrics;
     }
 
@@ -777,20 +804,121 @@ class SahamModel
     private function calculateStdDev($values)
     {
         if (empty($values)) return 0;
-        
+
         $mean = array_sum($values) / count($values);
-        $variance = array_sum(array_map(function($x) use ($mean) {
+        $variance = array_sum(array_map(function ($x) use ($mean) {
             return pow($x - $mean, 2);
         }, $values)) / count($values);
-        
+
         return sqrt($variance);
     }
+
+    /**
+     * Get last update info for scraper management
+     */
+    public function getLastUpdateInfo()
+    {
+        try {
+            // Try saham_topsis first (if exists)
+            try {
+                $this->db->query("SELECT MAX(last_updated) as last_update FROM saham_topsis");
+                $topsisUpdate = $this->db->single();
+
+                if ($topsisUpdate && $topsisUpdate->last_update) {
+                    $this->db->query("SELECT COUNT(*) as stock_count FROM saham_topsis");
+                    $stockCount = $this->db->single();
+
+                    if (strpos($topsisUpdate->last_update, ' ') !== false) {
+                        $formatted = date('d M Y, H:i', strtotime($topsisUpdate->last_update)) . ' WIB';
+                    } else {
+                        $formatted = date('d M Y', strtotime($topsisUpdate->last_update));
+                    }
+
+                    return [
+                        'last_update' => $topsisUpdate->last_update,
+                        'formatted' => $formatted,
+                        'stock_count' => $stockCount->stock_count ?? 0,
+                        'source' => 'saham_topsis'
+                    ];
+                }
+            } catch (Exception $e) {
+                // Table doesn't exist, fallback to saham
+            }
+
+            // Fallback to 'saham' table (existing structure)
+            $this->db->query("SELECT MAX(tanggal) as last_update FROM saham");
+            $sahamUpdate = $this->db->single();
+
+            $this->db->query("SELECT COUNT(DISTINCT kode_saham) as stock_count FROM saham");
+            $stockCount = $this->db->single();
+
+            if ($sahamUpdate && $sahamUpdate->last_update) {
+                return [
+                    'last_update' => $sahamUpdate->last_update,
+                    'formatted' => date('d M Y', strtotime($sahamUpdate->last_update)),
+                    'stock_count' => $stockCount->stock_count ?? 0,
+                    'source' => 'saham table'
+                ];
+            }
+
+            return null;
+        } catch (Exception $e) {
+            error_log("Error getting last update info: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get scraper logs
+     */
+    public function getScraperLogs($limit = 10)
+    {
+        try {
+            // Try to get from scraper_log table
+            $this->db->query("
+                SELECT * FROM scraper_log 
+                ORDER BY id_log DESC 
+                LIMIT :limit
+            ");
+            $this->db->bind(':limit', $limit);
+
+            return $this->db->resultSet();
+        } catch (Exception $e) {
+            // Table doesn't exist yet, return empty
+            return [];
+        }
+    }
+
+    /**
+     * Check if data for today has been scraped
+     * @return array|false Returns scrape info if scraped today, false otherwise
+     */
+    public function checkScrapedToday()
+    {
+        try {
+            $today = date('Y-m-d');
+
+            // Check from saham table if data for today exists
+            $this->db->query("
+                SELECT COUNT(*) as count, MAX(tanggal) as latest_date
+                FROM saham
+                WHERE DATE(tanggal) = :today
+            ");
+            $this->db->bind(':today', $today);
+            $result = $this->db->single();
+
+            if ($result && $result->count > 0) {
+                return [
+                    'date' => $today,
+                    'count' => $result->count,
+                    'formatted' => date('d M Y', strtotime($today))
+                ];
+            }
+
+            return false;
+        } catch (Exception $e) {
+            error_log("Error checking scraped today: " . $e->getMessage());
+            return false;
+        }
+    }
 }
-
-
-
-
-
-
-
-

@@ -46,12 +46,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link btn-laporan" id="btnOpenLaporan" type="button">
+                        <button class="nav-link" id="btnOpenLaporan" type="button">
                             <i class="fas fa-download me-1"></i> Unduh Laporan
                         </button>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= BASE_URL; ?>topsis">Analisis TOPSIS</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn-nav-cta" href="<?= BASE_URL; ?>topsis">
